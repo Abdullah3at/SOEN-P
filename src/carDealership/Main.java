@@ -1,28 +1,31 @@
 package carDealership;
 
 import java.util.Scanner;
-
 import persistance.DealershipLayer;
-
 import java.io.*;
 import java.sql.SQLException;
 
 public class Main {
-	public static Scanner input = new Scanner(System.in);
-	public static Dealership m_dealership;
+    public static Scanner input = new Scanner(System.in);
+    public static Dealership m_dealership;
 
-	public static void main(String args[]) throws IOException, ClassNotFoundException, SQLException {
-		var dealership = new DealershipLayer();
+    public static void main(String args[]) throws IOException, ClassNotFoundException, SQLException {
+        // Display the login page first
+        LoginPage.displayLogin();
+    }
 
-		// TODO: Add a method in DBManager to tell if the database was just created and
-		// use it here
-		if (!dealership.existsAndSet()) {
-			FirstLaunchPage newPage = new FirstLaunchPage();
-		} else {
-			m_dealership = new Dealership(dealership.getNname(), dealership.getLocation(), dealership.getCapacity());
-			Frame myFrame = new Frame();
-		}
-	}
+    public static void initializeApplication() throws IOException, ClassNotFoundException, SQLException {
+        var dealership = new DealershipLayer();
+
+        // TODO: Add a method in DBManager to tell if the database was just created and
+        // use it here
+        if (!dealership.existsAndSet()) {
+            FirstLaunchPage newPage = new FirstLaunchPage();
+        } else {
+            m_dealership = new Dealership(dealership.getNname(), dealership.getLocation(), dealership.getCapacity());
+            Frame myFrame = new Frame();
+        }
+    }
 
 	public static void addVehicleMenu() {
 		System.out.println("\n-------------------------------------------\n");
