@@ -14,7 +14,7 @@ public class Main {
         LoginPage.displayLogin();
     }
 
-    public static void initializeApplication() throws IOException, ClassNotFoundException, SQLException {
+    public static void initializeApplication(String role) throws IOException, ClassNotFoundException, SQLException {
         var dealership = new DealershipLayer();
 
         // TODO: Add a method in DBManager to tell if the database was just created and
@@ -23,7 +23,11 @@ public class Main {
             FirstLaunchPage newPage = new FirstLaunchPage();
         } else {
             m_dealership = new Dealership(dealership.getNname(), dealership.getLocation(), dealership.getCapacity());
-            Frame myFrame = new Frame();
+            if (role.equals("Admin")) {
+				new AdminDashboard("Admin").setVisible(true);
+            } else {
+                // Handle other roles if necessary
+            }
         }
     }
 

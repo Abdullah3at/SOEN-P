@@ -42,7 +42,7 @@ public class Dealership {
 
 	}
 
-	private int salesProfit() {
+	int salesProfit() {
 		int total = 0;
 		if (ns == 0) {
 			total = 0;

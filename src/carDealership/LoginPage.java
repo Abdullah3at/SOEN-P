@@ -5,6 +5,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginPage extends JFrame implements ActionListener {
     private static final long serialVersionUID = 1L;
@@ -13,8 +15,18 @@ public class LoginPage extends JFrame implements ActionListener {
     private JButton loginButton;
     private JLabel messageLabel;
 
-    private static final String USERNAME = "admin"; // Example username
-    private static final String PASSWORD = "password"; // Example password
+    private static final Map<String, String> users = new HashMap<>();
+    private static final Map<String, String> roles = new HashMap<>();
+
+    static {
+        users.put("admin", "password");
+        users.put("salesperson", "password");
+        users.put("manager", "password");
+
+        roles.put("admin", "Admin");
+        roles.put("salesperson", "Salesperson");
+        roles.put("manager", "Manager");
+    }
 
     public LoginPage() {
         setTitle("Car Dealership System - Login");
@@ -99,7 +111,9 @@ public class LoginPage extends JFrame implements ActionListener {
             messageLabel.setText("Login successful!");
             // Proceed to the main application
             try {
-                Main.initializeApplication(); // Call the initialization method of Main class
+                String role = roles.get(username);
+                System.out.println("Role: " + role); // Debugging statement
+                Main.initializeApplication(role); // Pass the role to the initialization method
                 dispose(); // Close the login window
             } catch (ClassNotFoundException | IOException | SQLException ex) {
                 ex.printStackTrace();
@@ -110,7 +124,7 @@ public class LoginPage extends JFrame implements ActionListener {
     }
 
     private boolean authenticate(String username, String password) {
-        return USERNAME.equals(username) && PASSWORD.equals(password);
+        return users.containsKey(username) && users.get(username).equals(password);
     }
 
     public static void displayLogin() {
