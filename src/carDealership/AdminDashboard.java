@@ -51,51 +51,51 @@ public class AdminDashboard extends JFrame implements ActionListener {
         
         // For Admin: show everything
         if(role.equalsIgnoreCase("Admin")) {
-            userManagementButton = createSidebarButton("User Management", new ImageIcon("icons/user.png"));
+            userManagementButton = createSidebarButton("User Management", new ImageIcon("images/user.png"));
             sidebar.add(userManagementButton);
             
-            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("icons/inventory.png"));
+            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/icon.jpg"));
             sidebar.add(inventoryManagementButton);
             
-            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("icons/sales.png"));
+            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png"));
             sidebar.add(salesHistoryButton);
             
-            viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("icons/dealership.png"));
+            viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("images/dealership.png"));
             sidebar.add(viewDealershipButton);
             
-            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("icons/sell.png"));
+            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
             sidebar.add(sellVehicleButton);
         }
         // For Manager: everything except User Management
         else if(role.equalsIgnoreCase("Manager")) {
-            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("icons/inventory.png"));
+            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png"));
             sidebar.add(inventoryManagementButton);
             
-            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("icons/sales.png"));
+            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png"));
             sidebar.add(salesHistoryButton);
             
-            viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("icons/dealership.png"));
+            viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("images/dealership.png"));
             sidebar.add(viewDealershipButton);
             
-            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("icons/sell.png"));
+            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
             sidebar.add(sellVehicleButton);
         }
         // For Salesperson: only view cars in inventory, sell car, and view sales history plus logout and quit
         else if(role.equalsIgnoreCase("Salesperson")) {
-            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("icons/inventory.png"));
+            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png"));
             sidebar.add(inventoryManagementButton);
             
-            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("icons/sales.png"));
+            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png"));
             sidebar.add(salesHistoryButton);
             
-            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("icons/sell.png"));
+            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
             sidebar.add(sellVehicleButton);
         }
         
         // Common options for all roles
-        logoutButton = createSidebarButton("Logout", new ImageIcon("icons/logout.png"));
+        logoutButton = createSidebarButton("Logout", new ImageIcon("images/logout.png"));
         sidebar.add(logoutButton);
-        quitButton = createSidebarButton("Quit", new ImageIcon("icons/quit.png"));
+        quitButton = createSidebarButton("Quit", new ImageIcon("images/quit.png"));
         sidebar.add(quitButton);
         
         // Create the main panel with CardLayout to load separate panels.
