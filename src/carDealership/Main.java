@@ -1,353 +1,225 @@
 package carDealership;
 
-import java.util.Scanner;
-import persistance.DealershipLayer;
-import java.io.*;
+import persistance.DatabaseManager;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Scanner;
 
 public class Main {
     public static Scanner input = new Scanner(System.in);
     public static Dealership m_dealership;
 
     public static void main(String args[]) throws IOException, ClassNotFoundException, SQLException {
-        // Display the login page first
+        // Pre-login: Ensure dealership info exists
+        ensureDealershipExists();
+        // Pre-login: Ensure at least one admin user exists
+        ensureAdminExists();
+        // Once checks pass, show the login page.
         LoginPage.displayLogin();
     }
 
-    public static void initializeApplication(String role) throws IOException, ClassNotFoundException, SQLException {
-        var dealership = new DealershipLayer();
+    private static void ensureDealershipExists() throws SQLException {
+        DatabaseManager dbManager = new DatabaseManager();
+        String query = "SELECT name, location, capacity FROM dealerships LIMIT 1";
+        PreparedStatement stmt = dbManager.getConnection().prepareStatement(query);
+        ResultSet rs = stmt.executeQuery();
 
-        // TODO: Add a method in DBManager to tell if the database was just created and
-        // use it here
-        if (!dealership.existsAndSet()) {
-            FirstLaunchPage newPage = new FirstLaunchPage();
+        if (rs.next()) {
+            String name = rs.getString("name");
+            String location = rs.getString("location");
+            int capacity = rs.getInt("capacity");
+            m_dealership = new Dealership(name, location, capacity);
         } else {
-            m_dealership = new Dealership(dealership.getNname(), dealership.getLocation(), dealership.getCapacity());
-            if (role.equals("Admin")) {
-				new AdminDashboard("Admin").setVisible(true);
+            showDealershipDialog(); // this dialog is modal
+            // Re-check after dialog closes
+            stmt = dbManager.getConnection().prepareStatement(query);
+            rs = stmt.executeQuery();
+            if (rs.next()) {
+                String name = rs.getString("name");
+                String location = rs.getString("location");
+                int capacity = rs.getInt("capacity");
+                m_dealership = new Dealership(name, location, capacity);
             } else {
-                // Handle other roles if necessary
+                JOptionPane.showMessageDialog(null, "Dealership creation is required. Exiting application.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
+            }
+        }
+        dbManager.close();
+    }
+
+    private static void showDealershipDialog() throws SQLException {
+        JDialog dlg = new JDialog((JFrame) null, "Enter Dealership Information", true);
+        dlg.setLayout(new GridLayout(0, 2, 10, 10));
+        dlg.setSize(400, 200);
+        dlg.setLocationRelativeTo(null);
+
+        JLabel nameLabel = new JLabel("Name:");
+        JTextField nameField = new JTextField();
+        nameField.setPreferredSize(new Dimension(200, 25));
+        dlg.add(nameLabel);
+        dlg.add(nameField);
+
+        JLabel locLabel = new JLabel("Location:");
+        JTextField locField = new JTextField();
+        locField.setPreferredSize(new Dimension(200, 25));
+        dlg.add(locLabel);
+        dlg.add(locField);
+
+        JLabel capLabel = new JLabel("Capacity:");
+        JTextField capField = new JTextField();
+        capField.setPreferredSize(new Dimension(200, 25));
+        dlg.add(capLabel);
+        dlg.add(capField);
+
+        JButton saveBtn = new JButton("Save");
+        dlg.add(new JLabel("")); // placeholder cell
+        dlg.add(saveBtn);
+
+        // If the user closes the window, exit the application.
+        dlg.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+
+        saveBtn.addActionListener(e -> {
+            String dname = nameField.getText().trim();
+            String dloc = locField.getText().trim();
+            String dcap = capField.getText().trim();
+            if (dname.isEmpty() || dloc.isEmpty() || dcap.isEmpty()) {
+                JOptionPane.showMessageDialog(dlg, "All fields are required.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            int capacity;
+            try {
+                capacity = Integer.parseInt(dcap);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dlg, "Capacity must be a valid integer.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                DatabaseManager dbManager = new DatabaseManager();
+                String insertQuery = "INSERT INTO dealerships (name, location, capacity) VALUES (?, ?, ?)";
+                PreparedStatement ps = dbManager.getConnection().prepareStatement(insertQuery);
+                ps.setString(1, dname);
+                ps.setString(2, dloc);
+                ps.setInt(3, capacity);
+                ps.executeUpdate();
+                dbManager.close();
+                JOptionPane.showMessageDialog(dlg, "Dealership information saved successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                dlg.dispose();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(dlg, "Error saving dealership information.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        dlg.setVisible(true);
+    }
+
+    private static void ensureAdminExists() throws SQLException {
+        if (!adminExists()) {
+            showAdminDialog();
+            if (!adminExists()) {
+                JOptionPane.showMessageDialog(null, "At least one admin user is required. Exiting application.", 
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                System.exit(0);
             }
         }
     }
 
-	public static void addVehicleMenu() {
-		System.out.println("\n-------------------------------------------\n");
-		System.out.println("Add a Vehicle");
-		System.out.println("\nChoose an option:");
-		System.out.println("1. Car");
-		System.out.println("2. Motorcycle");
-		System.out.println("3. Exit");
-
-		String choice = input.nextLine();
-
-		switch (choice) {
-		case "1":
-			addCarMenu();
-			break;
-		case "2":
-			addMotorcycleMenu();
-			break;
-		case "3":
-			return;
-		default:
-			System.out.println("Invalid choice. Please try again.");
-		}
-	}
-
-	public static void addCarMenu() {
-		System.out.println("\n-------------------------------------------\n");
-		System.out.println("Add a Car");
-
-		System.out.print("\nEnter the make: ");
-		String make = input.nextLine();
-
-		System.out.print("Enter the model: ");
-		String model = input.nextLine();
-
-		System.out.print("Enter the color: ");
-		String color = input.nextLine();
-
-		System.out.print("Enter the year: ");
-		int year = input.nextInt();
-
-		System.out.print("Enter the price: ");
-		double price = input.nextDouble();
-
-		System.out.print("Enter the type: ");
-		input.nextLine();
-		String type = input.nextLine();
-
-		if (m_dealership.addVehicle(new Car(make, model, color, year, price, type))) {
-			System.out.println("Car added succesfully.");
-		} else {
-			System.out.println("Couldn't add car.");
-		}
-	}
-
-	public static void addMotorcycleMenu() {
-		System.out.println("\n-------------------------------------------\n");
-		System.out.println("Add a Motorcycle");
-
-		System.out.print("\nEnter the make: ");
-		String make = input.nextLine();
-
-		System.out.print("Enter the model: ");
-		String model = input.nextLine();
-
-		System.out.print("Enter the color: ");
-		String color = input.nextLine();
-
-		System.out.print("Enter the year: ");
-		int year = input.nextInt();
-
-		System.out.print("Enter the price: ");
-		double price = input.nextDouble();
-		input.nextLine();
-
-		System.out.print("Enter the handlebar type: ");
-		String handlebarType = input.nextLine();
-
-		if (m_dealership.addVehicle(new Motorcycle(make, model, color, year, price, handlebarType))) {
-			System.out.println("Motorcycle added successfully.");
-		} else {
-			System.out.println("Couldn't add Motorcycle.");
-		}
-	}
-
-	public static void sellVehicleMenu() {
-		System.out.println("\n-------------------------------------------\n");
-		System.out.println("Sell a Vehicle");
-
-		System.out.print("\nEnter the id of the vehicle: ");
-		int id = input.nextInt();
-		input.nextLine();
-
-		if (m_dealership.getIndexFromId(id) == -1) {
-			System.out.println("\nVehicle not found!");
-			return;
-		}
-
-		System.out.print("Enter the buyer's name: ");
-		String buyerName = input.nextLine();
-
-		System.out.print("Enter the buyer's contact: ");
-		String buyerContact = input.nextLine();
-
-		Vehicle vehicle = m_dealership.getVehicleFromId(id);
-
-		if (m_dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-			System.out.println("Vehicle sold successfully.");
-		} else {
-			System.out.println("Couldn't sell vehicle");
-		}
-
-	}
-
-	public static void removeVehicleMenu() {
-		System.out.println("\n-------------------------------------------\n");
-		System.out.println("Remove a Vehicle");
-
-		System.out.print("\nEnter the id of the vehicle: ");
-		int id = input.nextInt();
-		input.nextLine();
-
-		if (m_dealership.getIndexFromId(id) == -1) {
-			System.out.println("\nVehicle not found!");
-			return;
-		}
-
-		Vehicle vehicle = m_dealership.getVehicleFromId(id);
-
-		if (m_dealership.removeVehicle(vehicle)) {
-			System.out.println("Vehicle removed successfully.");
-		} else {
-			System.out.println("Couldn't remove vehicle");
-		}
-	}
-
-	public static void editVehicleMenu() {
-		System.out.println("\n-------------------------------------------\n");
-		System.out.println("Edit a Vehicle");
-
-		System.out.print("\nEnter the id of the vehicle: ");
-		int id = input.nextInt();
-		input.nextLine();
-
-		if (m_dealership.getIndexFromId(id) == -1) {
-			System.out.println("\nVehicle not found!");
-			return;
-		}
-		System.out.println("\nEnter the new information");
-		Vehicle vehicle = m_dealership.getVehicleFromId(id);
-		vehicle.displayInfo();
-
-		if (vehicle instanceof Car) {
-			carEdit((Car) vehicle);
-		}
-		if (vehicle instanceof Motorcycle) {
-			motorcycleEdit((Motorcycle) vehicle);
-		}
-	}
-
-	public static void carEdit(Car c) {
-		System.out.print("\nEnter the make: ");
-		String make = input.nextLine();
-
-		System.out.print("Enter the model: ");
-		String model = input.nextLine();
-
-		System.out.print("Enter the color: ");
-		String color = input.nextLine();
-
-		System.out.print("Enter the year: ");
-		int year = input.nextInt();
-
-		System.out.print("Enter the price: ");
-		double price = input.nextDouble();
-
-		System.out.print("Enter the type: ");
-		input.nextLine();
-		String type = input.nextLine();
-
-		c.setMake(make);
-		c.setModel(model);
-		c.setColor(color);
-		c.setYear(year);
-		c.setPrice(price);
-		c.setType(type);
-
-	}
-
-	public static void motorcycleEdit(Motorcycle m) {
-		System.out.print("\nEnter the make: ");
-		String make = input.nextLine();
-
-		System.out.print("Enter the model: ");
-		String model = input.nextLine();
-
-		System.out.print("Enter the color: ");
-		String color = input.nextLine();
-
-		System.out.print("Enter the year: ");
-		int year = input.nextInt();
-
-		System.out.print("Enter the price: ");
-		double price = input.nextDouble();
-
-		System.out.print("Enter the handlebar type: ");
-		input.nextLine();
-		String handlebarType = input.nextLine();
-
-		m.setMake(make);
-		m.setModel(model);
-		m.setColor(color);
-		m.setYear(year);
-		m.setPrice(price);
-		m.setHandlebarType(handlebarType);
-
-	}
-
-	public static void searchCarMenu() {
-		if (!(m_dealership.isEmpty())) {
-
-			System.out.println("Enter type: ");
-			String s = input.nextLine();
-
-			Car[] v = m_dealership.searchCar(s);
-			int total = 0;
-			if (v != null) {
-				for (int i = 0; i < v.length; i++) {
-					if (v[i] != null) {
-						v[i].displayInfo();
-						System.out.println();
-						total++;
-					}
-				}
-			}
-			System.out.printf("Total found: [%d]\n", total);
-		} else
-			System.out.println("Sorry the inventory is empty.");
-	}
-
-	public static void changeColorMenu() {
-		System.out.println("\n-------------------------------------------\n");
-		System.out.println("Add a Vehicle");
-		System.out.println("\nChoose an option:");
-		System.out.println("1. Blue");
-		System.out.println("2. Green");
-		System.out.println("3. White");
-		System.out.println("4. Exit");
-		String choice = input.nextLine();
-
-		switch (choice) {
-		case "1":
-			System.out.println("\u001B[36m"); // Changes color to Blue.
-			break;
-		case "2":
-			System.out.println("\u001B[32m"); // Changes color to Green.
-
-			break;
-		case "3":
-			System.out.println("\u001B[0m"); // Changes color back to White.
-
-			break;
-		case "4":
-			return;
-		default:
-			System.out.println("Invalid choice. Please try again.");
-		}
-
-	}
-
-	public static void budgetCarMenu() {
-		if (!(m_dealership.isEmpty())) {
-
-			System.out.println("Enter budget: ");
-			String budget = input.nextLine();
-
-			for (int i = 0; i < budget.length(); i++) {
-				if (budget.charAt(i) < 48 || budget.charAt(i) > 57) { // Ascii digits from 0 to 9.
-					System.out.println("Invaild Input, Please enter postive numbers only.");
-					return;
-				}
-			}
-			{
-				int total = m_dealership.carBudget(Double.parseDouble(budget)); // Calling carBudget Method.
-				System.out.printf("Total [%d]\n", total);
-			}
-
-		} else
-			System.out.println("Sorry the inventory is empty.");
-	}
-
-	public static void createDealership(String name, String location, int capacity)
-			throws IllegalCapacityException, SQLException {
-		if (capacity < 1 || capacity > 100) {
-			throw new IllegalCapacityException();
-		}
-		m_dealership = new Dealership(name, location, capacity);
-	}
-
-	public static void save() throws IOException {
-		File saveFile = new File("save.data");
-		FileOutputStream outFileStream = null;
-		try {
-			outFileStream = new FileOutputStream(saveFile);
-		} catch (FileNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		ObjectOutputStream outObjStream = null;
-		try {
-			outObjStream = new ObjectOutputStream(outFileStream);
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-
-		outObjStream.writeObject(m_dealership);
-		outObjStream.close();
-
-	}
-}
+    private static boolean adminExists() throws SQLException {
+        DatabaseManager dbManager = new DatabaseManager();
+        String query = "SELECT COUNT(*) AS count FROM users JOIN roles ON users.roleId = roles.id WHERE roles.role = 'Admin'";
+        PreparedStatement stmt = dbManager.getConnection().prepareStatement(query);
+        ResultSet rs = stmt.executeQuery();
+        int count = 0;
+        if (rs.next()) {
+            count = rs.getInt("count");
+        }
+        dbManager.close();
+        return count > 0;
+    }
+
+    private static void showAdminDialog() throws SQLException {
+        JDialog dlg = new JDialog((JFrame) null, "Create Admin Account", true);
+        
+        // Use a panel with BoxLayout for compact layout.
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    
+        // Username row
+        JPanel userPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        JLabel userLabel = new JLabel("Username:");
+        JTextField userField = new JTextField(20);
+        userField.setMaximumSize(new Dimension(200, 25));
+        userPanel.add(userLabel);
+        userPanel.add(userField);
+        
+        // Password row
+        JPanel passPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        JLabel passLabel = new JLabel("Password:");
+        JPasswordField passField = new JPasswordField(20);
+        passField.setMaximumSize(new Dimension(200, 25));
+        passPanel.add(passLabel);
+        passPanel.add(passField);
+        
+        // Button row
+        JPanel btnPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 5));
+        JButton saveBtn = new JButton("Save Admin");
+        btnPanel.add(saveBtn);
+        
+        panel.add(userPanel);
+        panel.add(passPanel);
+        panel.add(btnPanel);
+        
+        dlg.getContentPane().add(panel);
+        dlg.pack();
+        dlg.setLocationRelativeTo(null);
+        dlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dlg.addWindowListener(new WindowAdapter(){
+            @Override
+            public void windowClosing(WindowEvent e) {
+                System.exit(0);
+            }
+        });
+        
+        saveBtn.addActionListener(e -> {
+            String username = userField.getText().trim();
+            String password = new String(passField.getPassword()).trim();
+            if (username.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(dlg, "Username and password are required.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                DatabaseManager dbManager = new DatabaseManager();
+                String insertQuery = "INSERT INTO users (name, password, roleId) VALUES (?, ?, (SELECT id FROM roles WHERE role = 'Admin'))";
+                PreparedStatement ps = dbManager.getConnection().prepareStatement(insertQuery);
+                ps.setString(1, username);
+                ps.setString(2, password);
+                ps.executeUpdate();
+                dbManager.close();
+                JOptionPane.showMessageDialog(dlg, "Admin user created successfully.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                dlg.dispose();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(dlg, "Error creating admin user.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        dlg.setVisible(true);
+    }
+    public static void initializeApplication(String role) {
+                // Initialize admin dashboard
+                AdminDashboard adminDashboard = new AdminDashboard(role);
+                adminDashboard.setVisible(true);
+   
+        }
+    }

@@ -1,32 +1,17 @@
 package carDealership;
 
+import persistance.DatabaseManager;
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
-import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginPage extends JFrame implements ActionListener {
-    private static final long serialVersionUID = 1L;
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton;
     private JLabel messageLabel;
-
-    private static final Map<String, String> users = new HashMap<>();
-    private static final Map<String, String> roles = new HashMap<>();
-
-    static {
-        users.put("admin", "password");
-        users.put("salesperson", "password");
-        users.put("manager", "password");
-
-        roles.put("admin", "Admin");
-        roles.put("salesperson", "Salesperson");
-        roles.put("manager", "Manager");
-    }
 
     public LoginPage() {
         setTitle("Car Dealership System - Login");
@@ -107,24 +92,64 @@ public class LoginPage extends JFrame implements ActionListener {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
 
-        if (authenticate(username, password)) {
-            messageLabel.setText("Login successful!");
-            // Proceed to the main application
-            try {
-                String role = roles.get(username);
-                System.out.println("Role: " + role); // Debugging statement
-                Main.initializeApplication(role); // Pass the role to the initialization method
-                dispose(); // Close the login window
-            } catch (ClassNotFoundException | IOException | SQLException ex) {
-                ex.printStackTrace();
+        try {
+            if (authenticate(username, password)) {
+                messageLabel.setText("Login successful!");
+                // If the user uses a temporary password, force a password change.
+                if (isTemporaryPassword(username)) {
+                    ChangePasswordDialog changeDialog = new ChangePasswordDialog(username);
+                    changeDialog.setVisible(true);
+                } else {
+                    // Otherwise, fetch the role and continue as normal.
+                    String role = getRole(username);
+                    System.out.println("Role: " + role); // Debugging statement
+                    AdminDashboard dashboard = createDashboardInstance(role);
+                    dashboard.setVisible(true);
+                    dispose(); // Close the login window
+                }
+            } else {
+                messageLabel.setText("Invalid username or password. Please try again.");
             }
-        } else {
-            messageLabel.setText("Invalid username or password. Please try again.");
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            messageLabel.setText("Database error. Please try again later.");
         }
     }
 
-    private boolean authenticate(String username, String password) {
-        return users.containsKey(username) && users.get(username).equals(password);
+    private boolean authenticate(String username, String password) throws SQLException {
+        DatabaseManager dbManager = new DatabaseManager();
+        String query = "SELECT * FROM users WHERE name = '" + username + "' AND password = '" + password + "'";
+        System.out.println("Executing query: " + query); // Debugging statement
+        ResultSet resultSet = dbManager.runQuery(query);
+        boolean authenticated = resultSet.next();
+        dbManager.close();
+        return authenticated;
+    }
+
+    private String getRole(String username) throws SQLException {
+        DatabaseManager dbManager = new DatabaseManager();
+        String query = "SELECT roles.role FROM users JOIN roles ON users.roleId = roles.id WHERE users.name = '" + username + "'";
+        System.out.println("Executing query: " + query); // Debugging statement
+        ResultSet resultSet = dbManager.runQuery(query);
+        String role = null;
+        if (resultSet.next()) {
+            role = resultSet.getString("role");
+        }
+        dbManager.close();
+        return role;
+    }
+
+    private boolean isTemporaryPassword(String username) throws SQLException {
+        DatabaseManager dbManager = new DatabaseManager();
+        String query = "SELECT isTemp FROM users WHERE name = '" + username + "'";
+        System.out.println("Executing temp query: " + query); // Debug
+        ResultSet resultSet = dbManager.runQuery(query);
+        boolean isTemp = false;
+        if (resultSet.next()) {
+            isTemp = resultSet.getBoolean("isTemp");
+        }
+        dbManager.close();
+        return isTemp;
     }
 
     public static void displayLogin() {
@@ -133,4 +158,16 @@ public class LoginPage extends JFrame implements ActionListener {
             loginPage.setVisible(true);
         });
     }
+
+    private AdminDashboard createDashboardInstance(String role) {
+        if (role.equals("Admin")) {
+            return new AdminDashboard("Admin");
+        } else if (role.equals("Manager")) {
+            return new AdminDashboard("Manager");
+        } else if (role.equals("Salesperson")) {
+            return new AdminDashboard("Salesperson");
+        }
+        return null;
+    }
+    
 }

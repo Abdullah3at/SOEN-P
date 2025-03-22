@@ -2,79 +2,84 @@ package carDealership;
 
 import java.io.Serializable;
 
-public abstract class Vehicle implements Serializable {
-	private static final long serialVersionUID = -8537773978564014927L;
-	protected String make, model, color;
-	protected int year;
-	protected double price;
-	protected int id;
-	// private static int nextId;
+public class Vehicle implements Serializable {
+    protected int id;
+    protected String make;
+    protected String model;
+    protected String color;
+    protected int year;
+    protected double price;
+    protected String type;
 
-	public Vehicle(String make, String model, String color, int year, double price) {
-		this.make = make;
-		this.model = model;
-		this.color = color;
-		this.year = year;
-		setPrice(price);
-	}
+    public Vehicle(int id, String make, String model, String color, int year, double price, String type) {
+        this.id = id;
+        this.make = make;
+        this.model = model;
+        this.color = color;
+        this.year = year;
+        this.price = price;
+        this.type = type;
+    }
 
-	public abstract void displayInfo();
+    // Getters and setters
+    public int getId() {
+        return id;
+    }
 
-	public String toString() {
+    public void setId(int id) {
+        this.id = id;
+    }
 
-		return "ID: " + id + "\nMake: " + make + "\nModel: " + model + "\nColor: " + color + "\nYear: " + year
-				+ "\nPrice: " + price;
-	}
+    public String getMake() {
+        return make;
+    }
 
-	public String getMake() {
-		return make;
-	}
+    public void setMake(String make) {
+        this.make = make;
+    }
 
-	public void setMake(String make) {
-		this.make = make;
-	}
+    public String getModel() {
+        return model;
+    }
 
-	public String getModel() {
-		return model;
-	}
+    public void setModel(String model) {
+        this.model = model;
+    }
 
-	public void setModel(String model) {
-		this.model = model;
-	}
+    public String getColor() {
+        return color;
+    }
 
-	public String getColor() {
-		return color;
-	}
+    public void setColor(String color) {
+        this.color = color;
+    }
 
-	public void setColor(String color) {
-		this.color = color;
-	}
+    public int getYear() {
+        return year;
+    }
 
-	public int getYear() {
-		return year;
-	}
+    public void setYear(int year) {
+        this.year = year;
+    }
 
-	public void setYear(int year) {
-		this.year = year;
-	}
+    public double getPrice() {
+        return price;
+    }
 
-	public double getPrice() {
-		return price;
-	}
+    public void setPrice(double price) {
+        this.price = price;
+    }
 
-	public void setPrice(double price) {
-		if (price < 0) {
-			price = 0;
-		}
-		this.price = price;
-	}
+    public String getType() {
+        return type;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
-
+    @Override
+    public String toString() {
+        return "ID: " + id + "\nMake: " + make + "\nModel: " + model + "\nColor: " + color + "\nYear: " + year + "\nPrice: " + price + " SAR" + "\nType: " + type;
+    }
 }
