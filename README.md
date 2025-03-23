@@ -83,17 +83,20 @@ Before running the program, ensure you have Java Development Kit (JDK) installed
 
 Below is a sample run of the program:
 
+Login Page:
+![login Page](image.png)
 
-## UML
-![Car Dealership UML Diagram](https://github.com/mohanad-hafez/car-dealership-system/assets/160021417/d538a3fc-6123-4bc2-b69b-5c4d9ed0b3cc)
+Admin Dashboard:
+![Admin Dashboard](image-1.png)
 
+Manager Dashboard:
+![Manager Dashboard](image-3.png)
 
+Dealership:
+![Dealership](image-2.png)
 
-## Team Members
-
-- [Mohanad Hafez](https://github.com/mohanad-hafez)
-- [Faris Al Zahrani](https://github.com/nxrzs)
-- [Hisham Saydawi](https://github.com/xAGS1)
+## Created by
+-Waqas Ahmad
 
 ## Possible Improvements
 
