@@ -112,7 +112,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         mainPanel.add(new InventoryManagementPanel(this), "Inventory Management");
         mainPanel.add(new SalesHistoryPanel(this), "Sales History");
         mainPanel.add(new ViewDealershipPanel(this), "View Dealership");
-        mainPanel.add(new SellVehiclePanel(this), "Sell Vehicle");
+        mainPanel.add(new SellVehiclePanel(), "Sell Vehicle");
         
         add(sidebar, BorderLayout.WEST);
         add(mainPanel, BorderLayout.CENTER);

@@ -7,7 +7,7 @@ import java.awt.event.*;
 import java.sql.SQLException;
 
 public class ChangePasswordDialog extends JDialog {
-    private JTextField newPasswordField;
+    private JPasswordField newPasswordField;
     private JPasswordField confirmPasswordField;
     private JButton changeButton;
     private JLabel messageLabel;
@@ -32,7 +32,7 @@ public class ChangePasswordDialog extends JDialog {
         formPanel.add(new JLabel("New Password:"), gbc);
 
         gbc.gridx = 1;
-        newPasswordField = new JTextField(15);
+        newPasswordField = new JPasswordField(15);
         formPanel.add(newPasswordField, gbc);
 
         gbc.gridx = 0;

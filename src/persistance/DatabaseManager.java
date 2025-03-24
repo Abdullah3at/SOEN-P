@@ -10,10 +10,10 @@ public class DatabaseManager {
     private Connection connection;
 
     public DatabaseManager() throws SQLException {
-        // Initialize the database connection
-        String url = "jdbc:mysql://sql5.freesqldatabase.com:3306/sql5767928";
-        String user = "sql5767928";
-        String password = "zLrrGJagjE";
+        // Initialize the database connection i put it localhost
+        String url = "jdbc:mysql://cardealershipapp_victorysee:82fec7d831f5d0ade1d73fb7b6bab4abcee88517@xyq-z.h.filess.io:61002/cardealershipapp_victorysee";
+        String user = "cardealershipapp_victorysee";
+        String password = "82fec7d831f5d0ade1d73fb7b6bab4abcee88517";
         connection = DriverManager.getConnection(url, user, password);
     }
 

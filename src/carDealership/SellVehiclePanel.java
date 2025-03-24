@@ -3,15 +3,16 @@ package carDealership;
 import javax.swing.*;
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.sql.*;
 import com.toedter.calendar.JDateChooser;
+
+import persistance.DatabaseManager;
+
 import java.util.Date;
 
 public class SellVehiclePanel extends JPanel {
     
-    private AdminDashboard parent;
-    
-    public SellVehiclePanel(AdminDashboard parent) {
-        this.parent = parent;
+    public SellVehiclePanel() {
         setLayout(new BorderLayout());
         setBackground(Color.LIGHT_GRAY);
         
@@ -19,7 +20,6 @@ public class SellVehiclePanel extends JPanel {
         headerLabel.setFont(new Font("Arial", Font.BOLD, 24));
         add(headerLabel, BorderLayout.NORTH);
         
-        // Add the custom Sell Vehicle form components
         add(createSellVehicleForm(), BorderLayout.CENTER);
     }
     
@@ -54,7 +54,7 @@ public class SellVehiclePanel extends JPanel {
         formPanel.add(new JLabel("Date:"), gbc);
         gbc.gridx = 1;
         JDateChooser dateChooser = new JDateChooser();
-        dateChooser.setDateFormatString("dd-MM-yyyy");
+        dateChooser.setDateFormatString("yyyy-MM-dd");
         formPanel.add(dateChooser, gbc);
     
         // Sell Button
@@ -84,7 +84,7 @@ public class SellVehiclePanel extends JPanel {
                 return;
             }
     
-            // Validate date selection and convert to SQL-friendly format (yyyy-MM-dd)
+            // Validate date selection and convert to SQL format
             Date selectedDate = dateChooser.getDate();
             if (selectedDate == null) {
                 JOptionPane.showMessageDialog(panel, "Please select a date.",
@@ -94,22 +94,58 @@ public class SellVehiclePanel extends JPanel {
             SimpleDateFormat dbFormat = new SimpleDateFormat("yyyy-MM-dd");
             String sqlDate = dbFormat.format(selectedDate);
     
-            // Retrieve the vehicle from the database using the dealership instance
-            Vehicle vehicle = parent.dealership.getVehicleFromId(vehicleIdInt);
-            if (vehicle == null) {
-                JOptionPane.showMessageDialog(panel, "Vehicle not found.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
+            try {
+                DatabaseManager dbManager = new DatabaseManager();
+                
+                // Fetch vehicle details from the database
+                String query1 = "SELECT id, make, model, price FROM vehicles WHERE id = ?";
+                PreparedStatement stmt1 = dbManager.getConnection().prepareStatement(query1);
+                stmt1.setInt(1, vehicleIdInt);
+                ResultSet rs1 = stmt1.executeQuery();
     
-            // Sell the vehicle: add sales record and mark the vehicle as sold.
-            boolean success = parent.dealership.sellVehicle(vehicle, buyerName, sqlDate);
-            if (success) {
-                JOptionPane.showMessageDialog(panel, "Vehicle sold successfully.",
-                        "Success", JOptionPane.INFORMATION_MESSAGE);
-                // Optionally, perform additional actions (refresh UI, etc.)
-            } else {
-                JOptionPane.showMessageDialog(panel, "Failed to sell vehicle.",
+                if (!rs1.next()) {
+                    JOptionPane.showMessageDialog(panel, "Vehicle not found.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+    
+                String make = rs1.getString("make");
+                String model = rs1.getString("model");
+                double price = rs1.getDouble("price");
+    
+                // Insert sale record
+                String query2 = "INSERT INTO sales (vehicleId, customerName, date, price) VALUES (?, ?, ?, ?)";
+                PreparedStatement stmt2 = dbManager.getConnection().prepareStatement(query2);
+                stmt2.setInt(1, vehicleIdInt);
+                stmt2.setString(2, buyerName);
+                stmt2.setString(3, sqlDate);
+                stmt2.setDouble(4, price);
+    
+                int rowsInserted = stmt2.executeUpdate();
+    
+                if (rowsInserted > 0) {
+                    // Mark the vehicle as sold
+                    String query3 = "UPDATE vehicles SET sold = '1' WHERE id = ?";
+                    PreparedStatement stmt3 = dbManager.getConnection().prepareStatement(query3);
+                    stmt3.setInt(1, vehicleIdInt);
+                    stmt3.executeUpdate();
+                    
+                    JOptionPane.showMessageDialog(panel, "Vehicle sold successfully!\n" +
+                            "Make: " + make + "\nModel: " + model + "\nPrice: $" + price,
+                            "Success", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(panel, "Failed to process sale.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                
+                // Close resources
+                rs1.close();
+                stmt1.close();
+                stmt2.close();
+    
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(panel, "Database error: " + ex.getMessage(),
                         "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
