@@ -201,7 +201,7 @@ public class Main {
             }
             try {
                 DatabaseManager dbManager = new DatabaseManager();
-                String insertQuery = "INSERT INTO users (name, password, roleId) VALUES (?, ?, (SELECT id FROM roles WHERE role = 'Admin'))";
+                String insertQuery = "INSERT INTO users (name, password, roleId) VALUES (?, ?, (SELECT id FROM roles WHERE role = 'Admin' LIMIT 1))";
                 PreparedStatement ps = dbManager.getConnection().prepareStatement(insertQuery);
                 ps.setString(1, username);
                 ps.setString(2, password);
