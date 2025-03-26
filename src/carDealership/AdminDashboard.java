@@ -617,7 +617,7 @@ public void showAddUserDialog() {
         try {
             DatabaseManager dbManager = new DatabaseManager();
             String query = "INSERT INTO users (name, password, roleId) VALUES ('" 
-                         + username + "', '" + password + "', (SELECT id FROM roles WHERE role = '" + role + "'))";
+                         + username + "', '" + password + "', (SELECT id FROM roles WHERE role = '" + role + "' LIMIT 1))";
             dbManager.runInsert(query);
             dbManager.close();
             JOptionPane.showMessageDialog(this, "User added successfully.");
