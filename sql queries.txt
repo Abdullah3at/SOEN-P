@@ -1,0 +1,62 @@
+-- Create the database
+CREATE DATABASE IF NOT EXISTS car_dealership;
+
+-- Use the database
+USE car_dealership;
+
+-- Create the dealerships table
+CREATE TABLE IF NOT EXISTS dealerships (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    location VARCHAR(255) NOT NULL,
+    capacity INT NOT NULL
+);
+
+-- Create the roles table
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role VARCHAR(255) NOT NULL
+);
+
+-- Create the users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    roleId INT,
+    isTemp BOOLEAN DEFAULT TRUE,
+	FOREIGN KEY (roleId) REFERENCES roles(id)
+);
+
+
+-- Create the vehicles table
+CREATE TABLE IF NOT EXISTS vehicles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    make VARCHAR(255) NOT NULL,
+    model VARCHAR(255) NOT NULL,
+    year INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    type VARCHAR(255) NOT NULL,
+    color VARCHAR(255) NOT NULL,
+    sold INT(1) NOT NULL DEFAULT 0
+);
+
+
+-- Create the sales table
+CREATE TABLE IF NOT EXISTS sales (
+    id INT AUTO_INCREMENT PRIMARY KEY,  -- Sale ID as the primary key
+    vehicleId INT NOT NULL,  -- Foreign key to the vehicles table
+    customerName VARCHAR(255) NOT NULL,  -- Name of the customer
+    price DECIMAL(10, 2) NOT NULL,  -- Sale price
+    date DATE NOT NULL,  -- Date of the sale
+    FOREIGN KEY (vehicleId) REFERENCES vehicles(id)  -- Foreign key relationship with the vehicles table
+);
+
+
+-- Insert sample roles into the roles table
+INSERT INTO roles (role) VALUES ('Admin');
+INSERT INTO roles (role) VALUES ('Manager');
+INSERT INTO roles (role) VALUES ('Salesperson');
+
+
+
