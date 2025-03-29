@@ -323,27 +323,40 @@ public class AdminDashboard extends JFrame implements ActionListener {
     editVehicleDialog.add(editButton);
 
     editButton.addActionListener(e -> {
+    try {
         int vehicleId = Integer.parseInt(vehicleIdField.getText());
         String make = makeField.getText();
         String model = modelField.getText();
         int year = Integer.parseInt(yearField.getText());
         double price = Double.parseDouble(priceField.getText());
-         String type = (String) typeComboBox.getSelectedItem();
+        String type = (String) typeComboBox.getSelectedItem();
         String color = colorField.getText();
+
+        // Validate Price
+        if (price < 0) {
+            JOptionPane.showMessageDialog(editVehicleDialog, "Price cannot be negative.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
 
         // Edit vehicle in the database
         try {
             DatabaseManager dbManager = new DatabaseManager();
-            String query = "UPDATE vehicles SET make = '" + make + "', model = '" + model + "', year = " + year + ", price = " + price + ", type = '" + type + "', color = '" + color + "' WHERE id = " + vehicleId;
+            String query = "UPDATE vehicles SET make = '" + make + "', model = '" + model + 
+                           "', year = " + year + ", price = " + price + ", type = '" + type + 
+                           "', color = '" + color + "' WHERE id = " + vehicleId;
             dbManager.runInsert(query);
             dbManager.close();
-            JOptionPane.showMessageDialog(this, "Vehicle edited successfully.");
+            JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle edited successfully.");
             editVehicleDialog.dispose();
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error editing vehicle.");
+            JOptionPane.showMessageDialog(editVehicleDialog, "Error editing vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    });
+
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(editVehicleDialog, "Please enter valid numeric values for Vehicle ID, Year, and Price.", "Error", JOptionPane.ERROR_MESSAGE);
+    }
+});
 
     editVehicleDialog.setVisible(true);
 }
