@@ -662,21 +662,73 @@ public void showEditUserDialog() {
     JPasswordField passwordField = new JPasswordField();
     editUserDialog.add(passwordField);
 
+    // New Role drop-down (JComboBox)
     editUserDialog.add(new JLabel("New Role:"));
-    JTextField roleField = new JTextField();
-    editUserDialog.add(roleField);
+    JComboBox<String> roleComboBox = new JComboBox<>(new String[] {"Admin", "Manager", "Salesperson"});
+    editUserDialog.add(roleComboBox);
 
-    JButton editButton = new JButton("Edit");
+    JButton loadButton = new JButton("Load Data");
+    editUserDialog.add(loadButton);
+
+    JButton editButton = new JButton("Submit");
     editUserDialog.add(editButton);
 
-    editButton.addActionListener(e -> {
-        int userId = Integer.parseInt(userIdField.getText());
-        String username = usernameField.getText();
-        String password = new String(passwordField.getPassword());
-        String role = roleField.getText();
-
-        // Edit user in the database
+    // Handle load data button click to populate fields
+    loadButton.addActionListener(e -> {
         try {
+            int userId = Integer.parseInt(userIdField.getText().trim());
+            DatabaseManager dbManager = new DatabaseManager();
+
+            // Fetch user data and role name
+            String query = "SELECT u.name, u.password, r.role FROM users u " +
+                           "JOIN roles r ON u.roleId = r.id WHERE u.id = " + userId;
+            System.out.println("Executing query: " + query);
+
+            ResultSet rs = dbManager.runQuery(query);
+
+            if (rs.next()) {
+                // Populate the fields with existing data
+                usernameField.setText(rs.getString("name"));
+                passwordField.setText(rs.getString("password"));
+                // Set the role in the combo box
+                String role = rs.getString("role");
+                roleComboBox.setSelectedItem(role); // Select role from the options
+                userIdField.setEditable(false);  // Make User ID field non-editable
+            } else {
+                // If no user found, clear the fields and show a message
+                usernameField.setText("");
+                passwordField.setText("");
+                roleComboBox.setSelectedIndex(0);  // Reset to the default role (first item)
+                JOptionPane.showMessageDialog(this, "User ID not found.");
+            }
+
+            rs.close();
+            dbManager.close();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error fetching user data. Please check the console for details.");
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid User ID format. Please enter a valid number.");
+        }
+    });
+
+    // Handle the edit action when the "Edit" button is clicked
+    editButton.addActionListener(e -> {
+        // Validate that none of the fields are empty
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword()).trim();
+        String role = (String) roleComboBox.getSelectedItem();
+
+        // Check if any field is empty
+        if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please fill in all fields.");
+            return;  // Prevent proceeding if any field is empty
+        }
+
+        try {
+            int userId = Integer.parseInt(userIdField.getText().trim());
+
+            // Update the user data in the database
             DatabaseManager dbManager = new DatabaseManager();
             String query = "UPDATE users SET name = '" + username + "', password = '" + password + "', roleId = (SELECT id FROM roles WHERE role = '" + role + "') WHERE id = " + userId;
             dbManager.runInsert(query);
@@ -686,11 +738,14 @@ public void showEditUserDialog() {
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error editing user.");
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid User ID format. Please enter a valid number.");
         }
     });
 
     editUserDialog.setVisible(true);
 }
+
 
 public void showDeleteUserDialog() {
     JDialog deleteUserDialog = new JDialog(this, "Delete User", true);

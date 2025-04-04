@@ -58,4 +58,9 @@ public class UserManagementPanel extends JPanel {
         // Automatically display user table when the panel is loaded.
         parent.showViewUsersDialog(model);
     }
+    
+    // Getter for JTable object
+    public JTable getUserTable() {
+        return userTable;
+    }
 }
