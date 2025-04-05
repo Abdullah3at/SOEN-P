@@ -367,10 +367,42 @@ public class AdminDashboard extends JFrame implements ActionListener {
     editVehicleDialog.add(new JLabel("New Color:"));
     JTextField colorField = new JTextField();
     editVehicleDialog.add(colorField);
+    
+    JButton loadButton = new JButton("Load Data");
+    editVehicleDialog.add(loadButton);  
+    // editVehicleDialog.add(new JLabel("")); 
 
-    JButton editButton = new JButton("Edit");
+    JButton editButton = new JButton("Submit");
     editVehicleDialog.add(editButton);
 
+    loadButton.addActionListener(e -> {
+        try {
+            int vehicleId = Integer.parseInt(vehicleIdField.getText());
+            DatabaseManager dbManager = new DatabaseManager();
+            String query = "SELECT * FROM vehicles WHERE id = " + vehicleId;
+            ResultSet rs = dbManager.runQuery(query);
+            
+            if (rs.next()) {
+                makeField.setText(rs.getString("make"));
+                modelField.setText(rs.getString("model"));
+                yearField.setText(String.valueOf(rs.getInt("year")));
+                priceField.setText(String.valueOf(rs.getDouble("price")));
+                typeComboBox.setSelectedItem(rs.getString("type"));
+                colorField.setText(rs.getString("color"));
+            } else {
+                JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle not found.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+            rs.close();
+            dbManager.close();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(editVehicleDialog, "Please enter a valid numeric Vehicle ID.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(editVehicleDialog, "Error loading vehicle data.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+    
     editButton.addActionListener(e -> {
     try {
         int vehicleId = Integer.parseInt(vehicleIdField.getText());
@@ -381,6 +413,13 @@ public class AdminDashboard extends JFrame implements ActionListener {
         String type = (String) typeComboBox.getSelectedItem();
         String color = colorField.getText();
 
+        // Check for empty fields
+        if (make.isEmpty() || model.isEmpty() || yearField.getText().isEmpty() ||
+            priceField.getText().isEmpty() || color.isEmpty()) {
+            JOptionPane.showMessageDialog(editVehicleDialog, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        
         //validate Price
         if (price < 0) {
             JOptionPane.showMessageDialog(editVehicleDialog, "Price cannot be negative.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -395,8 +434,8 @@ public class AdminDashboard extends JFrame implements ActionListener {
 
         //validate year
         int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-        if (year < 1960 || year > currentYear) {
-            JOptionPane.showMessageDialog(editVehicleDialog, "Year must be between 1960 and " + currentYear + ".", "Error", JOptionPane.ERROR_MESSAGE);
+        if (year < 1960 || year > currentYear+1) { // Sometimes the "model year" is one year in the future, with new cars
+            JOptionPane.showMessageDialog(editVehicleDialog, "Year must be between 1960 and " + (currentYear+1) + ".", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
