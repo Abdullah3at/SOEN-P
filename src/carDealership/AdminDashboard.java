@@ -224,101 +224,94 @@ public class AdminDashboard extends JFrame implements ActionListener {
     public void showAddVehicleDialog() {
         JDialog addVehicleDialog = new JDialog(this, "Add Vehicle", true);
         addVehicleDialog.setSize(400, 400);
-        addVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
         addVehicleDialog.setLocationRelativeTo(this);
-        //added spacing between the text and the borders
-        //((JComponent) addVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        //adding car details
-        addVehicleDialog.add(new JLabel("Make:"));
+    
+        JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    
         JTextField makeField = new JTextField();
-        addVehicleDialog.add(makeField);
-        
-    
-        addVehicleDialog.add(new JLabel("Model:"));
         JTextField modelField = new JTextField();
-        addVehicleDialog.add(modelField);
-    
-        addVehicleDialog.add(new JLabel("Year:"));
         JTextField yearField = new JTextField();
-        addVehicleDialog.add(yearField);
-    
-        addVehicleDialog.add(new JLabel("Price:"));
         JTextField priceField = new JTextField();
-        addVehicleDialog.add(priceField);
-    
-        addVehicleDialog.add(new JLabel("Type:"));
-        //dropdown - JComboBox for type with options "Car" or "Motorcycle"
-        String[] types = {"Car", "Motorcycle"};
-        JComboBox<String> typeComboBox = new JComboBox<>(types);
-        addVehicleDialog.add(typeComboBox);
-    
-        addVehicleDialog.add(new JLabel("Color:"));
+        JComboBox<String> typeComboBox = new JComboBox<>(new String[]{"Car", "Motorcycle"});
         JTextField colorField = new JTextField();
-        addVehicleDialog.add(colorField);
+    
+        contentPanel.add(new JLabel("Make:"));
+        contentPanel.add(makeField);
+    
+        contentPanel.add(new JLabel("Model:"));
+        contentPanel.add(modelField);
+    
+        contentPanel.add(new JLabel("Year:"));
+        contentPanel.add(yearField);
+    
+        contentPanel.add(new JLabel("Price:"));
+        contentPanel.add(priceField);
+    
+        contentPanel.add(new JLabel("Type:"));
+        contentPanel.add(typeComboBox);
+    
+        contentPanel.add(new JLabel("Color:"));
+        contentPanel.add(colorField);
     
         JButton addButton = new JButton("Add");
-        addVehicleDialog.add(addButton);
+        contentPanel.add(new JLabel()); // filler
+        contentPanel.add(addButton);
+    
+        addVehicleDialog.setContentPane(contentPanel);
     
         addButton.addActionListener(e -> {
             String make = makeField.getText().trim();
-            //validate data type for make (String)
-            if (!make.matches("[a-zA-Z ]+")) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
             String model = modelField.getText().trim();
             String yearText = yearField.getText().trim();
             String priceText = priceField.getText().trim();
             String type = (String) typeComboBox.getSelectedItem();
             String color = colorField.getText().trim();
     
-            //verify that all the required fields are filled
             if (make.isEmpty() || model.isEmpty() || yearText.isEmpty() || priceText.isEmpty() || color.isEmpty()) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(addVehicleDialog, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+    
+            if (!make.matches("[a-zA-Z ]+")) {
+                JOptionPane.showMessageDialog(addVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
     
             int year;
-            double price;
-            //validate year
             try {
                 year = Integer.parseInt(yearText);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Year must be a valid integer.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-            //make sure year cannot be less than 1960
-            if (year < 1960) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Year cannot be less than 1960.", "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-            //year cannot be in the future, can't exceed current date
-            if (year > currentYear) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Year cannot exceed the current year (" + currentYear + ").", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(addVehicleDialog, "Year must be a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
     
-            //validate price - must be above 1
+            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+            if (year < 1960 || year > currentYear) {
+                JOptionPane.showMessageDialog(addVehicleDialog, "Year must be between 1960 and " + currentYear + ".", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+    
+            double price;
             try {
                 price = Double.parseDouble(priceText);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(addVehicleDialog, "Price must be a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+    
             if (price < 1) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Invalid price.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(addVehicleDialog, "Price must be greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
     
-            //add vehicle to the database
             try {
                 DatabaseManager dbManager = new DatabaseManager();
-                String query = "INSERT INTO vehicles (make, model, year, price, type, color) VALUES ('" 
-                            + make + "', '" + model + "', " + year + ", " + price + ", '" + type + "', '" + color + "')";
+                String query = "INSERT INTO vehicles (make, model, year, price, type, color) VALUES ('"
+                             + make + "', '" + model + "', " + year + ", " + price + ", '" + type + "', '" + color + "')";
                 dbManager.runInsert(query);
                 dbManager.close();
+    
                 JOptionPane.showMessageDialog(this, "Vehicle added successfully.");
                 addVehicleDialog.dispose();
             } catch (SQLException ex) {
@@ -329,211 +322,223 @@ public class AdminDashboard extends JFrame implements ActionListener {
     
         addVehicleDialog.setVisible(true);
     }
+             
 
-   public void showEditVehicleDialog() {
-    JDialog editVehicleDialog = new JDialog(this, "Edit Vehicle", true);
-    editVehicleDialog.setSize(400, 400);
-    editVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
-    editVehicleDialog.setLocationRelativeTo(this);
-    //added spacing between the text and the borders
-    //((JComponent) addVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
-
-    editVehicleDialog.add(new JLabel("Vehicle ID:"));
-    JTextField vehicleIdField = new JTextField();
-    editVehicleDialog.add(vehicleIdField);
-
-    editVehicleDialog.add(new JLabel("New Make:"));
-    JTextField makeField = new JTextField();
-    editVehicleDialog.add(makeField);
-
-    editVehicleDialog.add(new JLabel("New Model:"));
-    JTextField modelField = new JTextField();
-    editVehicleDialog.add(modelField);
-
-    editVehicleDialog.add(new JLabel("New Year:"));
-    JTextField yearField = new JTextField();
-    editVehicleDialog.add(yearField);
-
-    editVehicleDialog.add(new JLabel("New Price:"));
-    JTextField priceField = new JTextField();
-    editVehicleDialog.add(priceField);
-
-    editVehicleDialog.add(new JLabel("New Type:"));
-    String[] types = {"Car", "Motorcycle"};
-    JComboBox<String> typeComboBox = new JComboBox<>(types);
-    editVehicleDialog.add(typeComboBox);
-
-    editVehicleDialog.add(new JLabel("New Color:"));
-    JTextField colorField = new JTextField();
-    editVehicleDialog.add(colorField);
+    public void showEditVehicleDialog() {
+        JDialog editVehicleDialog = new JDialog(this, "Edit Vehicle", true);
+        editVehicleDialog.setSize(400, 400);
+        editVehicleDialog.setLocationRelativeTo(this);
     
-    JButton loadButton = new JButton("Load Data");
-    editVehicleDialog.add(loadButton);  
-    // editVehicleDialog.add(new JLabel("")); 
-
-    JButton editButton = new JButton("Submit");
-    editVehicleDialog.add(editButton);
-
-    loadButton.addActionListener(e -> {
-        try {
-            int vehicleId = Integer.parseInt(vehicleIdField.getText());
-            DatabaseManager dbManager = new DatabaseManager();
-            String query = "SELECT * FROM vehicles WHERE id = " + vehicleId;
-            ResultSet rs = dbManager.runQuery(query);
-            
-            if (rs.next()) {
-                makeField.setText(rs.getString("make"));
-                modelField.setText(rs.getString("model"));
-                yearField.setText(String.valueOf(rs.getInt("year")));
-                priceField.setText(String.valueOf(rs.getDouble("price")));
-                typeComboBox.setSelectedItem(rs.getString("type"));
-                colorField.setText(rs.getString("color"));
-            } else {
-                JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle not found.", "Error", JOptionPane.ERROR_MESSAGE);
+        JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    
+        JTextField vehicleIdField = new JTextField();
+        JTextField makeField = new JTextField();
+        JTextField modelField = new JTextField();
+        JTextField yearField = new JTextField();
+        JTextField priceField = new JTextField();
+        JComboBox<String> typeComboBox = new JComboBox<>(new String[]{"Car", "Motorcycle"});
+        JTextField colorField = new JTextField();
+    
+        contentPanel.add(new JLabel("Vehicle ID:"));
+        contentPanel.add(vehicleIdField);
+    
+        contentPanel.add(new JLabel("New Make:"));
+        contentPanel.add(makeField);
+    
+        contentPanel.add(new JLabel("New Model:"));
+        contentPanel.add(modelField);
+    
+        contentPanel.add(new JLabel("New Year:"));
+        contentPanel.add(yearField);
+    
+        contentPanel.add(new JLabel("New Price:"));
+        contentPanel.add(priceField);
+    
+        contentPanel.add(new JLabel("New Type:"));
+        contentPanel.add(typeComboBox);
+    
+        contentPanel.add(new JLabel("New Color:"));
+        contentPanel.add(colorField);
+    
+        JButton loadButton = new JButton("Load Data");
+        contentPanel.add(new JLabel()); // filler
+        contentPanel.add(loadButton);
+    
+        JButton editButton = new JButton("Submit");
+        contentPanel.add(new JLabel()); // filler
+        contentPanel.add(editButton);
+    
+        editVehicleDialog.setContentPane(contentPanel);
+    
+        // Load data
+        loadButton.addActionListener(e -> {
+            try {
+                int vehicleId = Integer.parseInt(vehicleIdField.getText().trim());
+                DatabaseManager dbManager = new DatabaseManager();
+                String query = "SELECT * FROM vehicles WHERE id = " + vehicleId;
+                ResultSet rs = dbManager.runQuery(query);
+    
+                if (rs.next()) {
+                    makeField.setText(rs.getString("make"));
+                    modelField.setText(rs.getString("model"));
+                    yearField.setText(String.valueOf(rs.getInt("year")));
+                    priceField.setText(String.valueOf(rs.getDouble("price")));
+                    typeComboBox.setSelectedItem(rs.getString("type"));
+                    colorField.setText(rs.getString("color"));
+                } else {
+                    JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle not found.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+    
+                rs.close();
+                dbManager.close();
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(editVehicleDialog, "Please enter a valid numeric Vehicle ID.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(editVehicleDialog, "Error loading vehicle data.", "Error", JOptionPane.ERROR_MESSAGE);
             }
-
-            rs.close();
-            dbManager.close();
-        } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(editVehicleDialog, "Please enter a valid numeric Vehicle ID.", "Error", JOptionPane.ERROR_MESSAGE);
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(editVehicleDialog, "Error loading vehicle data.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    });
+        });
     
-    editButton.addActionListener(e -> {
-    try {
-        int vehicleId = Integer.parseInt(vehicleIdField.getText());
-        String make = makeField.getText();
-        String model = modelField.getText();
-        int year = Integer.parseInt(yearField.getText());
-        double price = Double.parseDouble(priceField.getText());
-        String type = (String) typeComboBox.getSelectedItem();
-        String color = colorField.getText();
-
-        // Check for empty fields
-        if (make.isEmpty() || model.isEmpty() || yearField.getText().isEmpty() ||
-            priceField.getText().isEmpty() || color.isEmpty()) {
-            JOptionPane.showMessageDialog(editVehicleDialog, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        //validate Price
-        if (price < 0) {
-            JOptionPane.showMessageDialog(editVehicleDialog, "Price cannot be negative.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        //validate make
-        if (!make.matches("[a-zA-Z ]+")) {
-            JOptionPane.showMessageDialog(editVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        //validate year
-        int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-        if (year < 1960 || year > currentYear+1) { // Sometimes the "model year" is one year in the future, with new cars
-            JOptionPane.showMessageDialog(editVehicleDialog, "Year must be between 1960 and " + (currentYear+1) + ".", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        //edit vehicle in the database - update details
-        try {
-            DatabaseManager dbManager = new DatabaseManager();
-            String query = "UPDATE vehicles SET make = '" + make + "', model = '" + model + 
-                           "', year = " + year + ", price = " + price + ", type = '" + type + 
-                           "', color = '" + color + "' WHERE id = " + vehicleId;
-            dbManager.runInsert(query);
-            dbManager.close();
-            JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle edited successfully.");
-            editVehicleDialog.dispose();
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(editVehicleDialog, "Error editing vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(editVehicleDialog, "Please enter valid numeric values for Vehicle ID, Year, and Price.", "Error", JOptionPane.ERROR_MESSAGE);
+        // Submit edit
+        editButton.addActionListener(e -> {
+            try {
+                int vehicleId = Integer.parseInt(vehicleIdField.getText().trim());
+                String make = makeField.getText().trim();
+                String model = modelField.getText().trim();
+                String yearText = yearField.getText().trim();
+                String priceText = priceField.getText().trim();
+                String type = (String) typeComboBox.getSelectedItem();
+                String color = colorField.getText().trim();
+    
+                // Empty check
+                if (make.isEmpty() || model.isEmpty() || yearText.isEmpty() || priceText.isEmpty() || color.isEmpty()) {
+                    JOptionPane.showMessageDialog(editVehicleDialog, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+    
+                // Make validation
+                if (!make.matches("[a-zA-Z ]+")) {
+                    JOptionPane.showMessageDialog(editVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+    
+                // Year validation
+                int year = Integer.parseInt(yearText);
+                int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+                if (year < 1960 || year > currentYear + 1) {
+                    JOptionPane.showMessageDialog(editVehicleDialog, "Year must be between 1960 and " + (currentYear + 1) + ".", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+    
+                // Price validation
+                double price = Double.parseDouble(priceText);
+                if (price < 0) {
+                    JOptionPane.showMessageDialog(editVehicleDialog, "Price cannot be negative.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+    
+                // Update vehicle
+                DatabaseManager dbManager = new DatabaseManager();
+                String updateQuery = "UPDATE vehicles SET " +
+                                     "make = '" + make + "', " +
+                                     "model = '" + model + "', " +
+                                     "year = " + year + ", " +
+                                     "price = " + price + ", " +
+                                     "type = '" + type + "', " +
+                                     "color = '" + color + "' " +
+                                     "WHERE id = " + vehicleId;
+                dbManager.runInsert(updateQuery);
+                dbManager.close();
+    
+                JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle updated successfully.");
+                editVehicleDialog.dispose();
+    
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(editVehicleDialog, "Please enter valid numeric values for Vehicle ID, Year, and Price.", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(editVehicleDialog, "Error updating vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    
+        editVehicleDialog.setVisible(true);
     }
-});
-
-    editVehicleDialog.setVisible(true);
-}
-
-    //method to show Deleta Vehicle feauture in Inventory Management
+     
     public void showDeleteVehicleDialog() {
         JDialog deleteVehicleDialog = new JDialog(this, "Delete Vehicle", true);
-        deleteVehicleDialog.setSize(400, 200);
-        deleteVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
+        deleteVehicleDialog.setSize(400, 250);
         deleteVehicleDialog.setLocationRelativeTo(this);
     
-        deleteVehicleDialog.add(new JLabel("Vehicle ID:"));
+        JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
+        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+    
         JTextField vehicleIdField = new JTextField();
-        deleteVehicleDialog.add(vehicleIdField);
+        contentPanel.add(new JLabel("Vehicle ID:"));
+        contentPanel.add(vehicleIdField);
     
         JButton deleteButton = new JButton("Delete");
-        deleteVehicleDialog.add(deleteButton);
+        contentPanel.add(new JLabel()); // filler
+        contentPanel.add(deleteButton);
     
-        /*
-         * after entering vehicle id, car details are fetched from the database
-         * so the use can verify the details before deleting a vehicle
-         */
+        deleteVehicleDialog.setContentPane(contentPanel);
+    
+        // Delete vehicle action
         deleteButton.addActionListener(e -> {
-            int vehicleId = Integer.parseInt(vehicleIdField.getText());
-    
-            //delete vehicle from the database
             try {
+                int vehicleId = Integer.parseInt(vehicleIdField.getText().trim());
+    
                 DatabaseManager dbManager = new DatabaseManager();
-        
-                // fetch vehicle details
+    
+                // Fetch vehicle details
                 String fetchQuery = "SELECT make, model, year, price, type, color FROM vehicles WHERE id = " + vehicleId;
                 ResultSet rs = dbManager.runQuery(fetchQuery);
-        
+    
                 if (!rs.next()) {
-                    JOptionPane.showMessageDialog(this, "Vehicle not found.");
+                    JOptionPane.showMessageDialog(deleteVehicleDialog, "Vehicle not found.", "Error", JOptionPane.ERROR_MESSAGE);
                     dbManager.close();
                     return;
                 }
-        
-                //build confirmation message with the vehicle details
+    
+                // Build confirmation message
                 String vehicleDetails = "Make: " + rs.getString("make") +
                                         "\nModel: " + rs.getString("model") +
                                         "\nYear: " + rs.getInt("year") +
                                         "\nPrice: $" + rs.getDouble("price") +
                                         "\nType: " + rs.getString("type") +
                                         "\nColor: " + rs.getString("color");
-        
-                int confirm = JOptionPane.showConfirmDialog(this,
+    
+                // Confirm deletion
+                int confirm = JOptionPane.showConfirmDialog(deleteVehicleDialog,
                         "Are you sure you want to delete this vehicle?\n\n" + vehicleDetails,
-                        "Confirm Deletion",
-                        JOptionPane.YES_NO_OPTION);
-        
+                        "Confirm Deletion", JOptionPane.YES_NO_OPTION);
+    
                 if (confirm != JOptionPane.YES_OPTION) {
                     dbManager.close();
                     return;
                 }
-        
+    
+                // Delete vehicle from database
                 String deleteQuery = "DELETE FROM vehicles WHERE id = " + vehicleId;
                 int rowsAffected = dbManager.runInsert(deleteQuery);
                 dbManager.close();
-        
+    
                 if (rowsAffected > 0) {
-                    JOptionPane.showMessageDialog(this, "Vehicle deleted successfully.");
+                    JOptionPane.showMessageDialog(deleteVehicleDialog, "Vehicle deleted successfully.");
                     deleteVehicleDialog.dispose();
                     showViewVehiclesDialog((DefaultTableModel) vehicleTable.getModel());
                 } else {
-                    JOptionPane.showMessageDialog(this, "Vehicle not found.");
+                    JOptionPane.showMessageDialog(deleteVehicleDialog, "Error deleting vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (SQLException ex) {
+            } catch (SQLException | NumberFormatException ex) {
                 ex.printStackTrace();
-                JOptionPane.showMessageDialog(this, "Error deleting vehicle.");
+                JOptionPane.showMessageDialog(deleteVehicleDialog, "Error deleting vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+    
         deleteVehicleDialog.setVisible(true);
     }
-
+    
     public void showViewVehiclesDialog(DefaultTableModel model) {
     //clear existing rows
     model.setRowCount(0);
@@ -728,43 +733,47 @@ private void applyFilters(JTable vehicleTable, boolean budget, double minBudget,
 
 public void showAddUserDialog() {
     JDialog addUserDialog = new JDialog(this, "Add User", true);
-    addUserDialog.setSize(400, 300);
-    addUserDialog.setLayout(new GridLayout(0, 2, 10, 10));
+    addUserDialog.setSize(400, 250);
     addUserDialog.setLocationRelativeTo(this);
 
-    addUserDialog.add(new JLabel("Username:"));
+    JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+    contentPanel.add(new JLabel("Username:"));
     JTextField usernameField = new JTextField();
-    addUserDialog.add(usernameField);
+    contentPanel.add(usernameField);
 
-    addUserDialog.add(new JLabel("Password:"));
-    JPasswordField passwordField = new JPasswordField();
-    addUserDialog.add(passwordField);
+    contentPanel.add(new JLabel("Password:"));
+    JTextField passwordField = new JTextField("TempPass"); // Default visible text
+    passwordField.setEditable(false); // Prevent editing
+    contentPanel.add(passwordField);
 
-    addUserDialog.add(new JLabel("Role:"));
-    JTextField roleField = new JTextField();
-    addUserDialog.add(roleField);
+    contentPanel.add(new JLabel("Role:"));
+    JComboBox<String> roleComboBox = new JComboBox<>(new String[] {"Admin", "Manager", "Salesperson"});
+    contentPanel.add(roleComboBox);
 
     JButton addButton = new JButton("Add");
-    addUserDialog.add(addButton);
+    contentPanel.add(new JLabel()); // filler to align button to the right
+    contentPanel.add(addButton);
+
+    addUserDialog.setContentPane(contentPanel);
 
     addButton.addActionListener(e -> {
         String username = usernameField.getText().trim();
-        String password = new String(passwordField.getPassword()).trim();
-        String role = roleField.getText().trim();
+        String password = "TempPass"; // Always TempPass
+        String role = roleComboBox.getSelectedItem().toString();
 
-        // Validate that role is one of the allowed values.
-        if (!(role.equalsIgnoreCase("Admin") || role.equalsIgnoreCase("Manager") || role.equalsIgnoreCase("Salesperson"))) {
+        if (username.isEmpty()) {
             JOptionPane.showMessageDialog(addUserDialog,
-                    "Role must be either Admin, Manager, or Salesperson.",
+                    "Username cannot be empty.",
                     "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Add user to the database
         try {
             DatabaseManager dbManager = new DatabaseManager();
-            String query = "INSERT INTO users (name, password, roleId) VALUES ('" 
-                         + username + "', '" + password + "', (SELECT id FROM roles WHERE role = '" + role + "' LIMIT 1))";
+            String query = "INSERT INTO users (name, password, roleId, isTemp) VALUES ('" 
+                         + username + "', '" + password + "', (SELECT id FROM roles WHERE role = '" + role + "' LIMIT 1), 1)";
             dbManager.runInsert(query);
             dbManager.close();
             JOptionPane.showMessageDialog(this, "User added successfully.");
@@ -778,61 +787,59 @@ public void showAddUserDialog() {
     addUserDialog.setVisible(true);
 }
 
+
 public void showEditUserDialog() {
     JDialog editUserDialog = new JDialog(this, "Edit User", true);
-    editUserDialog.setSize(400, 300);
-    editUserDialog.setLayout(new GridLayout(0, 2, 10, 10));
+    editUserDialog.setSize(600, 300);
     editUserDialog.setLocationRelativeTo(this);
 
-    editUserDialog.add(new JLabel("User ID:"));
+    // Create a panel with padding and GridLayout
+    JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
+    contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20)); // top, left, bottom, right
+
+    // Create components
+    contentPanel.add(new JLabel("User ID:"));
     JTextField userIdField = new JTextField();
-    editUserDialog.add(userIdField);
+    contentPanel.add(userIdField);
 
-    editUserDialog.add(new JLabel("New Username:"));
+    contentPanel.add(new JLabel("New Username:"));
     JTextField usernameField = new JTextField();
-    editUserDialog.add(usernameField);
+    contentPanel.add(usernameField);
 
-    editUserDialog.add(new JLabel("New Password:"));
+    contentPanel.add(new JLabel("New Password:"));
     JPasswordField passwordField = new JPasswordField();
-    editUserDialog.add(passwordField);
+    contentPanel.add(passwordField);
 
-    // New Role drop-down (JComboBox)
-    editUserDialog.add(new JLabel("New Role:"));
+    contentPanel.add(new JLabel("New Role:"));
     JComboBox<String> roleComboBox = new JComboBox<>(new String[] {"Admin", "Manager", "Salesperson"});
-    editUserDialog.add(roleComboBox);
+    contentPanel.add(roleComboBox);
 
     JButton loadButton = new JButton("Load Data");
-    editUserDialog.add(loadButton);
+    contentPanel.add(loadButton);
 
     JButton editButton = new JButton("Submit");
-    editUserDialog.add(editButton);
+    contentPanel.add(editButton);
 
-    // Handle load data button click to populate fields
+    // Add content panel to dialog
+    editUserDialog.setContentPane(contentPanel);
+
+    // Load data action
     loadButton.addActionListener(e -> {
         try {
             int userId = Integer.parseInt(userIdField.getText().trim());
             DatabaseManager dbManager = new DatabaseManager();
-
-            // Fetch user data and role name
-            String query = "SELECT u.name, u.password, r.role FROM users u " +
+            String query = "SELECT u.name, r.role FROM users u " +
                            "JOIN roles r ON u.roleId = r.id WHERE u.id = " + userId;
-            System.out.println("Executing query: " + query);
-
             ResultSet rs = dbManager.runQuery(query);
 
             if (rs.next()) {
-                // Populate the fields with existing data
                 usernameField.setText(rs.getString("name"));
-                passwordField.setText(rs.getString("password"));
-                // Set the role in the combo box
-                String role = rs.getString("role");
-                roleComboBox.setSelectedItem(role); // Select role from the options
-                userIdField.setEditable(false);  // Make User ID field non-editable
+                passwordField.setText("TempPass"); // Pre-set to TempPass
+                roleComboBox.setSelectedItem(rs.getString("role"));
+                userIdField.setEditable(false);
             } else {
-                // If no user found, clear the fields and show a message
                 usernameField.setText("");
-                passwordField.setText("");
-                roleComboBox.setSelectedIndex(0);  // Reset to the default role (first item)
+                roleComboBox.setSelectedIndex(0);
                 JOptionPane.showMessageDialog(this, "User ID not found.");
             }
 
@@ -840,40 +847,40 @@ public void showEditUserDialog() {
             dbManager.close();
         } catch (SQLException ex) {
             ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error fetching user data. Please check the console for details.");
+            JOptionPane.showMessageDialog(this, "Error fetching user data.");
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid User ID format. Please enter a valid number.");
+            JOptionPane.showMessageDialog(this, "Invalid User ID format.");
         }
     });
 
-    // Handle the edit action when the "Edit" button is clicked
+    // Edit action
     editButton.addActionListener(e -> {
-        // Validate that none of the fields are empty
         String username = usernameField.getText().trim();
-        String password = new String(passwordField.getPassword()).trim();
+        String password = "TempPass"; // Always set password to TempPass
         String role = (String) roleComboBox.getSelectedItem();
 
-        // Check if any field is empty
         if (username.isEmpty() || password.isEmpty() || role.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Please fill in all fields.");
-            return;  // Prevent proceeding if any field is empty
+            return;
         }
 
         try {
             int userId = Integer.parseInt(userIdField.getText().trim());
-
-            // Update the user data in the database
             DatabaseManager dbManager = new DatabaseManager();
-            String query = "UPDATE users SET name = '" + username + "', password = '" + password + "', roleId = (SELECT id FROM roles WHERE role = '" + role + "') WHERE id = " + userId;
+            String query = "UPDATE users SET name = '" + username + "', password = '" + password +
+                           "', roleId = (SELECT id FROM roles WHERE role = '" + role + "'), isTemp = 1 WHERE id = " + userId;
             dbManager.runInsert(query);
             dbManager.close();
-            JOptionPane.showMessageDialog(this, "User edited successfully.");
+
+            // Show a dialog notifying that the password has been reset
+            JOptionPane.showMessageDialog(this, "User edited successfully.\nPassword has been reset to TempPass.", 
+                                          "Password Reset", JOptionPane.INFORMATION_MESSAGE);
             editUserDialog.dispose();
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error editing user.");
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Invalid User ID format. Please enter a valid number.");
+            JOptionPane.showMessageDialog(this, "Invalid User ID format.");
         }
     });
 
@@ -884,34 +891,54 @@ public void showEditUserDialog() {
 public void showDeleteUserDialog() {
     JDialog deleteUserDialog = new JDialog(this, "Delete User", true);
     deleteUserDialog.setSize(400, 200);
-    deleteUserDialog.setLayout(new GridLayout(0, 2, 10, 10));
     deleteUserDialog.setLocationRelativeTo(this);
 
-    deleteUserDialog.add(new JLabel("User ID:"));
+    JPanel panel = new JPanel(new GridLayout(0, 2, 20, 15));
+    panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+    panel.add(new JLabel("User ID:"));
     JTextField userIdField = new JTextField();
-    deleteUserDialog.add(userIdField);
+    panel.add(userIdField);
 
     JButton deleteButton = new JButton("Delete");
-    deleteUserDialog.add(deleteButton);
+    panel.add(new JLabel()); // Filler
+    panel.add(deleteButton);
+
+    deleteUserDialog.setContentPane(panel);
 
     deleteButton.addActionListener(e -> {
-        int userId = Integer.parseInt(userIdField.getText());
+        String input = userIdField.getText().trim();
+        if (input.isEmpty()) {
+            JOptionPane.showMessageDialog(deleteUserDialog, "User ID cannot be empty.");
+            return;
+        }
 
-        // Delete user from the database
         try {
-            DatabaseManager dbManager = new DatabaseManager();
-            String query = "DELETE FROM users WHERE id = " + userId;
-            int rowsAffected = dbManager.runInsert(query);
-            dbManager.close();
+            int userId = Integer.parseInt(input);
 
-            if (rowsAffected > 0) {
-                JOptionPane.showMessageDialog(this, "User deleted successfully.");
-                deleteUserDialog.dispose();
-                // Update the user table
-                showViewUsersDialog((DefaultTableModel) userTable.getModel());
-            } else {
-                JOptionPane.showMessageDialog(this, "User not found.");
+            int confirm = JOptionPane.showConfirmDialog(
+                deleteUserDialog,
+                "Are you sure you want to delete user with ID: " + userId + "?",
+                "Confirm Deletion",
+                JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                DatabaseManager dbManager = new DatabaseManager();
+                String query = "DELETE FROM users WHERE id = " + userId;
+                int rowsAffected = dbManager.runInsert(query);
+                dbManager.close();
+
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "User deleted successfully.");
+                    deleteUserDialog.dispose();
+                    showViewUsersDialog((DefaultTableModel) userTable.getModel());
+                } else {
+                    JOptionPane.showMessageDialog(this, "User not found.");
+                }
             }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(deleteUserDialog, "Invalid User ID. Please enter a valid number.");
         } catch (SQLException ex) {
             ex.printStackTrace();
             JOptionPane.showMessageDialog(this, "Error deleting user.");
@@ -928,16 +955,16 @@ public void showViewUsersDialog(DefaultTableModel model) {
     // Fetch users from the database
     try {
         DatabaseManager dbManager = new DatabaseManager();
-        String query = "SELECT users.id, users.name, users.password, roles.role FROM users JOIN roles ON users.roleId = roles.id order by users.id";
+        String query = "SELECT users.id, users.name, roles.role, users.isTemp FROM users JOIN roles ON users.roleId = roles.id order by users.id";
         ResultSet resultSet = dbManager.runQuery(query);
 
         // Populate the table with data
         while (resultSet.next()) {
             int userId = resultSet.getInt("id");
             String username = resultSet.getString("name");
-            String password = resultSet.getString("password");
             String role = resultSet.getString("role");
-            model.addRow(new Object[]{userId, username, password, role});
+            String isTemp = (1 == resultSet.getInt("isTemp")) ? "Yes" : "No";            
+            model.addRow(new Object[]{userId, username, role, isTemp});
         }
 
         dbManager.close();
