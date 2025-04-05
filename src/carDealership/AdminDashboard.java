@@ -12,24 +12,31 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
+/*
+ * This is the main dashboard frame for role-based access to the dealership system application.
+ * 
+ */
+
 public class AdminDashboard extends JFrame implements ActionListener {
+    //user interface components for sidebar actions
     private JButton userManagementButton, inventoryManagementButton, salesHistoryButton, viewDealershipButton, sellVehicleButton, logoutButton, quitButton;
-    private JLabel roleLabel;
-    private String role;
+    private JLabel roleLabel; //display current logged in user role
+    private String role; //current role
     private JPanel mainPanel, sidebar;
-    private CardLayout cardLayout;
+    private CardLayout cardLayout; //card layout to switch between the panels dynamically
     Dealership dealership;
     private JButton selectedButton; // currently selected sidebar button
     public JTable userTable, vehicleTable, salesTable;
     
-
+    //default constructor for the dashboard (admin)
     public AdminDashboard() {
         this("Admin");
     }
     
+    //constructor for the dashboard component with role-based parameter
     public AdminDashboard(String role) {
         this.role = role;
-        setTitle(role + " Dashboard");
+        setTitle(role + " Dashboard"); //shows what's the role of the current user logged in
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -38,18 +45,19 @@ public class AdminDashboard extends JFrame implements ActionListener {
         
 
         
-        // Build the sidebar based on role
+        //build the sidebar based on role
         sidebar = new JPanel();
         sidebar.setLayout(new GridLayout(0, 1, 10, 10));
         sidebar.setBackground(new Color(35, 45, 65));
         sidebar.setPreferredSize(new Dimension(200, getHeight()));
         
+        //display the role of the user in the top left corner
         roleLabel = new JLabel("Role: " + role, SwingConstants.CENTER);
         roleLabel.setForeground(Color.WHITE);
-        roleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        roleLabel.setFont(new Font("Verdana", Font.BOLD, 20));
         sidebar.add(roleLabel);
         
-        // For Admin: show everything
+        //if the logged in user is Admin: show all the features
         if(role.equalsIgnoreCase("Admin")) {
             userManagementButton = createSidebarButton("User Management", new ImageIcon("images/user.png"));
             sidebar.add(userManagementButton);
@@ -66,7 +74,8 @@ public class AdminDashboard extends JFrame implements ActionListener {
             sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
             sidebar.add(sellVehicleButton);
         }
-        // For Manager: everything except User Management
+
+        //if the logged in user is Manager: show everything except User Management
         else if(role.equalsIgnoreCase("Manager")) {
             inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png"));
             sidebar.add(inventoryManagementButton);
@@ -80,7 +89,8 @@ public class AdminDashboard extends JFrame implements ActionListener {
             sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
             sidebar.add(sellVehicleButton);
         }
-        // For Salesperson: only view cars in inventory, sell car, and view sales history plus logout and quit
+
+        //if the logged in user is Salesperson: show cars in Inventory, Sell Vehicle, and Sales History
         else if(role.equalsIgnoreCase("Salesperson")) {
             inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png"));
             sidebar.add(inventoryManagementButton);
@@ -92,20 +102,21 @@ public class AdminDashboard extends JFrame implements ActionListener {
             sidebar.add(sellVehicleButton);
         }
         
-        // Common options for all roles
+        //common options for all roles
         logoutButton = createSidebarButton("Logout", new ImageIcon("images/logout.png"));
         sidebar.add(logoutButton);
         quitButton = createSidebarButton("Quit", new ImageIcon("images/quit.png"));
         sidebar.add(quitButton);
         
-        // Create the main panel with CardLayout to load separate panels.
+        //create the main panel with CardLayout to load separate panels
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         mainPanel.setBackground(Color.DARK_GRAY);
         
-        // Add panels – you might want to adjust the panels themselves based on role.
-        // For example, InventoryManagementPanel for Salesperson can be modified to display only cars.
+        /*adding panels based on roles – can be modified in case there's a need to add or remove functionalities
+        for each role, for example, Inventory Management Panel for Salesperson can be modified to display only cars.
+        */
         if(role.equalsIgnoreCase("Admin")) {
             mainPanel.add(new UserManagementPanel(this), "User Management");
         }
@@ -118,12 +129,13 @@ public class AdminDashboard extends JFrame implements ActionListener {
         add(mainPanel, BorderLayout.CENTER);
 
         
-    // Set default selection
+    //set default selection for the panel that the user sees after logs in
     JButton defaultButton = null;
     if(role.equalsIgnoreCase("Admin")) {
+        //for Admin, default to User Management
         defaultButton = userManagementButton;
     } else {
-        // For both Manager and Salesperson, default to Inventory Management.
+        //for both Manager and Salesperson, default to Inventory Management.
         defaultButton = inventoryManagementButton;
     }
     if(defaultButton != null) {
@@ -132,9 +144,10 @@ public class AdminDashboard extends JFrame implements ActionListener {
     }
     }
     
+    //method to create UI for the sidebar with action listener
     private JButton createSidebarButton(String text, ImageIcon icon) {
         JButton button = new JButton(text, icon);
-        button.setFont(new Font("Arial", Font.BOLD, 14));
+        button.setFont(new Font("Verdana", Font.BOLD, 14));
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
@@ -143,6 +156,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         button.setIconTextGap(10);
         button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         button.addActionListener(this);
+        //hover effects for the buttons
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -162,6 +176,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         return button;
     }
     
+    //highlight selected button with lighter color
     public void setSelectedButton(JButton selectedButton) {
         this.selectedButton = selectedButton;
         for (Component component : sidebar.getComponents()) {
@@ -178,31 +193,47 @@ public class AdminDashboard extends JFrame implements ActionListener {
         }
     }
     
+    //handle button actions (regular click or logout)
     @Override
     public void actionPerformed(ActionEvent e) {
-        JButton source = (JButton)e.getSource();
-        setSelectedButton(source);
+        JButton source = (JButton) e.getSource();
+        setSelectedButton(source); //update styling of selected button
         String command = e.getActionCommand();
         cardLayout.show(mainPanel, command);
-        
+    //if the selected button is Logout - prompt the user to confirm 
         if (e.getSource() == logoutButton) {
-            dispose();
-            LoginPage.displayLogin();
+            int choice = JOptionPane.showConfirmDialog(
+                this,
+                "Are you sure you want to log out?",
+                "Confirm Logout",
+                JOptionPane.YES_NO_OPTION
+            );
+    
+            if (choice == JOptionPane.YES_OPTION) {
+                dispose(); //close current window
+                LoginPage.displayLogin(); //show login page
+            }
+            //if NO_OPTION is selected, do nothing - simply close the dialog and return 
+    
         } else if (e.getSource() == quitButton) {
             System.exit(0);
         }
     }
     
-    // The following methods are kept in AdminDashboard to be called by panel components.
+    //the following methods are kept in AdminDashboard to be called by panel components.
     public void showAddVehicleDialog() {
         JDialog addVehicleDialog = new JDialog(this, "Add Vehicle", true);
         addVehicleDialog.setSize(400, 400);
         addVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
         addVehicleDialog.setLocationRelativeTo(this);
-    
+        //added spacing between the text and the borders
+        //((JComponent) addVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        //adding car details
         addVehicleDialog.add(new JLabel("Make:"));
         JTextField makeField = new JTextField();
         addVehicleDialog.add(makeField);
+        
     
         addVehicleDialog.add(new JLabel("Model:"));
         JTextField modelField = new JTextField();
@@ -217,7 +248,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         addVehicleDialog.add(priceField);
     
         addVehicleDialog.add(new JLabel("Type:"));
-        // Use JComboBox for type with options "Car" or "Motorcycle"
+        //dropdown - JComboBox for type with options "Car" or "Motorcycle"
         String[] types = {"Car", "Motorcycle"};
         JComboBox<String> typeComboBox = new JComboBox<>(types);
         addVehicleDialog.add(typeComboBox);
@@ -231,13 +262,18 @@ public class AdminDashboard extends JFrame implements ActionListener {
     
         addButton.addActionListener(e -> {
             String make = makeField.getText().trim();
+            //validate data type for make (String)
+            if (!make.matches("[a-zA-Z ]+")) {
+                JOptionPane.showMessageDialog(addVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
             String model = modelField.getText().trim();
             String yearText = yearField.getText().trim();
             String priceText = priceField.getText().trim();
             String type = (String) typeComboBox.getSelectedItem();
             String color = colorField.getText().trim();
     
-            // Check all required fields are filled
+            //verify that all the required fields are filled
             if (make.isEmpty() || model.isEmpty() || yearText.isEmpty() || priceText.isEmpty() || color.isEmpty()) {
                 JOptionPane.showMessageDialog(addVehicleDialog, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
@@ -245,7 +281,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
     
             int year;
             double price;
-            // Validate Year
+            //validate year
             try {
                 year = Integer.parseInt(yearText);
             } catch (NumberFormatException ex) {
@@ -253,20 +289,30 @@ public class AdminDashboard extends JFrame implements ActionListener {
                 return;
             }
             int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+            //make sure year cannot be less than 1960
+            if (year < 1960) {
+                JOptionPane.showMessageDialog(addVehicleDialog, "Year cannot be less than 1960.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            //year cannot be in the future, can't exceed current date
             if (year > currentYear) {
                 JOptionPane.showMessageDialog(addVehicleDialog, "Year cannot exceed the current year (" + currentYear + ").", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
     
-            // Validate Price
+            //validate price - must be above 1
             try {
                 price = Double.parseDouble(priceText);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(addVehicleDialog, "Price must be a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
+            if (price < 1) {
+                JOptionPane.showMessageDialog(addVehicleDialog, "Invalid price.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
     
-            // Add vehicle to the database
+            //add vehicle to the database
             try {
                 DatabaseManager dbManager = new DatabaseManager();
                 String query = "INSERT INTO vehicles (make, model, year, price, type, color) VALUES ('" 
@@ -289,6 +335,9 @@ public class AdminDashboard extends JFrame implements ActionListener {
     editVehicleDialog.setSize(400, 400);
     editVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
     editVehicleDialog.setLocationRelativeTo(this);
+    //added spacing between the text and the borders
+    //((JComponent) addVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 
     editVehicleDialog.add(new JLabel("Vehicle ID:"));
     JTextField vehicleIdField = new JTextField();
@@ -332,13 +381,26 @@ public class AdminDashboard extends JFrame implements ActionListener {
         String type = (String) typeComboBox.getSelectedItem();
         String color = colorField.getText();
 
-        // Validate Price
+        //validate Price
         if (price < 0) {
             JOptionPane.showMessageDialog(editVehicleDialog, "Price cannot be negative.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        // Edit vehicle in the database
+        //validate make
+        if (!make.matches("[a-zA-Z ]+")) {
+            JOptionPane.showMessageDialog(editVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //validate year
+        int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+        if (year < 1960 || year > currentYear) {
+            JOptionPane.showMessageDialog(editVehicleDialog, "Year must be between 1960 and " + currentYear + ".", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        //edit vehicle in the database - update details
         try {
             DatabaseManager dbManager = new DatabaseManager();
             String query = "UPDATE vehicles SET make = '" + make + "', model = '" + model + 
@@ -360,6 +422,8 @@ public class AdminDashboard extends JFrame implements ActionListener {
 
     editVehicleDialog.setVisible(true);
 }
+
+    //method to show Deleta Vehicle feauture in Inventory Management
     public void showDeleteVehicleDialog() {
         JDialog deleteVehicleDialog = new JDialog(this, "Delete Vehicle", true);
         deleteVehicleDialog.setSize(400, 200);
@@ -373,20 +437,52 @@ public class AdminDashboard extends JFrame implements ActionListener {
         JButton deleteButton = new JButton("Delete");
         deleteVehicleDialog.add(deleteButton);
     
+        /*
+         * after entering vehicle id, car details are fetched from the database
+         * so the use can verify the details before deleting a vehicle
+         */
         deleteButton.addActionListener(e -> {
             int vehicleId = Integer.parseInt(vehicleIdField.getText());
     
-            // Delete vehicle from the database
+            //delete vehicle from the database
             try {
                 DatabaseManager dbManager = new DatabaseManager();
-                String query = "DELETE FROM vehicles WHERE id = " + vehicleId;
-                int rowsAffected = dbManager.runInsert(query);
+        
+                // fetch vehicle details
+                String fetchQuery = "SELECT make, model, year, price, type, color FROM vehicles WHERE id = " + vehicleId;
+                ResultSet rs = dbManager.runQuery(fetchQuery);
+        
+                if (!rs.next()) {
+                    JOptionPane.showMessageDialog(this, "Vehicle not found.");
+                    dbManager.close();
+                    return;
+                }
+        
+                //build confirmation message with the vehicle details
+                String vehicleDetails = "Make: " + rs.getString("make") +
+                                        "\nModel: " + rs.getString("model") +
+                                        "\nYear: " + rs.getInt("year") +
+                                        "\nPrice: $" + rs.getDouble("price") +
+                                        "\nType: " + rs.getString("type") +
+                                        "\nColor: " + rs.getString("color");
+        
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to delete this vehicle?\n\n" + vehicleDetails,
+                        "Confirm Deletion",
+                        JOptionPane.YES_NO_OPTION);
+        
+                if (confirm != JOptionPane.YES_OPTION) {
+                    dbManager.close();
+                    return;
+                }
+        
+                String deleteQuery = "DELETE FROM vehicles WHERE id = " + vehicleId;
+                int rowsAffected = dbManager.runInsert(deleteQuery);
                 dbManager.close();
-    
+        
                 if (rowsAffected > 0) {
                     JOptionPane.showMessageDialog(this, "Vehicle deleted successfully.");
                     deleteVehicleDialog.dispose();
-                    // Update the vehicle table
                     showViewVehiclesDialog((DefaultTableModel) vehicleTable.getModel());
                 } else {
                     JOptionPane.showMessageDialog(this, "Vehicle not found.");
@@ -396,21 +492,20 @@ public class AdminDashboard extends JFrame implements ActionListener {
                 JOptionPane.showMessageDialog(this, "Error deleting vehicle.");
             }
         });
-    
         deleteVehicleDialog.setVisible(true);
     }
 
     public void showViewVehiclesDialog(DefaultTableModel model) {
-    // Clear existing rows
+    //clear existing rows
     model.setRowCount(0);
 
-    // Fetch vehicles from the database excluding sold ones
+    //fetch vehicles from the database excluding sold ones
     try {
         DatabaseManager dbManager = new DatabaseManager();
         String query = "SELECT id, make, model, year, price, type, color FROM vehicles WHERE sold = 0";
         ResultSet resultSet = dbManager.runQuery(query);
 
-        // Populate the table with data
+        //populate the table with data
         while (resultSet.next()) {
             int vehicleId = resultSet.getInt("id");
             String make = resultSet.getString("make");
@@ -474,7 +569,7 @@ public void showFilterDialog(JTable vehicleTable) {
     filterDialog.add(typeComboBox, gbc);
     gbc.gridwidth = 1;
 
-    // Color filter remains unchanged
+    //color filter remains unchanged
     JCheckBox colorCheckBox = new JCheckBox("Color");
     JTextField colorField = new JTextField();
     colorField.setPreferredSize(new Dimension(200, 25));
@@ -489,8 +584,8 @@ public void showFilterDialog(JTable vehicleTable) {
     filterDialog.add(colorField, gbc);
     gbc.gridwidth = 1;
 
-    // Brand filter remains unchanged
-    JCheckBox brandCheckBox = new JCheckBox("Brand");
+    //Make filter remains unchanged
+    JCheckBox brandCheckBox = new JCheckBox("Make");
     JTextField brandField = new JTextField();
     brandField.setPreferredSize(new Dimension(200, 25));
 
@@ -498,13 +593,13 @@ public void showFilterDialog(JTable vehicleTable) {
     gbc.gridy = 3;
     filterDialog.add(brandCheckBox, gbc);
     gbc.gridx = 1;
-    filterDialog.add(new JLabel("Brand:"), gbc);
+    filterDialog.add(new JLabel("Make:"), gbc);
     gbc.gridx = 2;
     gbc.gridwidth = 3;
     filterDialog.add(brandField, gbc);
     gbc.gridwidth = 1;
 
-    // Date filter: using JDateChoosers for from and to dates
+    //date filter: using JDateChoosers for from and to dates
     JCheckBox dateCheckBox = new JCheckBox("Date");
     JDateChooser fromDateChooser = new JDateChooser();
     fromDateChooser.setDateFormatString("dd-MM-yyyy");

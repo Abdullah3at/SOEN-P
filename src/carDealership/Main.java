@@ -1,7 +1,5 @@
 package carDealership;
 
-import persistance.DatabaseManager;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -10,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
+import javax.swing.*;
+import persistance.DatabaseManager;
 
 public class Main {
     public static Scanner input = new Scanner(System.in);
