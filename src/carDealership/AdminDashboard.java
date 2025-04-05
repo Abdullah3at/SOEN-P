@@ -226,8 +226,9 @@ public class AdminDashboard extends JFrame implements ActionListener {
         addVehicleDialog.setSize(400, 400);
         addVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
         addVehicleDialog.setLocationRelativeTo(this);
-        //added spacing between the text and the borders
-        //((JComponent) addVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        //spacing
+        ((JComponent) addVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
         
         //adding car details
         addVehicleDialog.add(new JLabel("Make:"));
@@ -335,9 +336,8 @@ public class AdminDashboard extends JFrame implements ActionListener {
     editVehicleDialog.setSize(400, 400);
     editVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
     editVehicleDialog.setLocationRelativeTo(this);
-    //added spacing between the text and the borders
-    //((JComponent) addVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
+    //spacing
+    ((JComponent) editVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
     editVehicleDialog.add(new JLabel("Vehicle ID:"));
     JTextField vehicleIdField = new JTextField();
@@ -468,6 +468,9 @@ public class AdminDashboard extends JFrame implements ActionListener {
         deleteVehicleDialog.setSize(400, 200);
         deleteVehicleDialog.setLayout(new GridLayout(0, 2, 10, 10));
         deleteVehicleDialog.setLocationRelativeTo(this);
+        //spacing
+        ((JComponent) deleteVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
     
         deleteVehicleDialog.add(new JLabel("Vehicle ID:"));
         JTextField vehicleIdField = new JTextField();
@@ -731,6 +734,8 @@ public void showAddUserDialog() {
     addUserDialog.setSize(400, 300);
     addUserDialog.setLayout(new GridLayout(0, 2, 10, 10));
     addUserDialog.setLocationRelativeTo(this);
+    ((JComponent) addUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 
     addUserDialog.add(new JLabel("Username:"));
     JTextField usernameField = new JTextField();
@@ -783,6 +788,8 @@ public void showEditUserDialog() {
     editUserDialog.setSize(400, 300);
     editUserDialog.setLayout(new GridLayout(0, 2, 10, 10));
     editUserDialog.setLocationRelativeTo(this);
+    ((JComponent) editUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 
     editUserDialog.add(new JLabel("User ID:"));
     JTextField userIdField = new JTextField();
@@ -886,6 +893,8 @@ public void showDeleteUserDialog() {
     deleteUserDialog.setSize(400, 200);
     deleteUserDialog.setLayout(new GridLayout(0, 2, 10, 10));
     deleteUserDialog.setLocationRelativeTo(this);
+    ((JComponent) deleteUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 
     deleteUserDialog.add(new JLabel("User ID:"));
     JTextField userIdField = new JTextField();
