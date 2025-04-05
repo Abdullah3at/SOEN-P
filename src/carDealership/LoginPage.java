@@ -85,6 +85,9 @@ public class LoginPage extends JFrame implements ActionListener {
 
         // Set background color for the frame
         getContentPane().setBackground(Color.LIGHT_GRAY);
+        
+     // Allow pressing Enter to trigger login
+        getRootPane().setDefaultButton(loginButton);
     }
 
     @Override
