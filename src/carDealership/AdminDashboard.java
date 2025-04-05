@@ -48,7 +48,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         //build the sidebar based on role
         sidebar = new JPanel();
         sidebar.setLayout(new GridLayout(0, 1, 10, 10));
-        sidebar.setBackground(new Color(35, 45, 65));
+        sidebar.setBackground(Color.decode("#56CCF2"));
         sidebar.setPreferredSize(new Dimension(200, getHeight()));
         
         //display the role of the user in the top left corner
@@ -161,7 +161,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (button != selectedButton) {
-                    button.setBackground(new Color(50, 60, 80));
+                    button.setBackground(Color.decode("#2F80ED"));
                     button.setOpaque(true);
                 }
             }
@@ -183,7 +183,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
             if (component instanceof JButton) {
                 JButton button = (JButton) component;
                 if (button == selectedButton) {
-                    button.setBackground(new Color(50, 60, 80));
+                    button.setBackground(Color.decode("#2F80ED"));
                     button.setOpaque(true);
                 } else {
                     button.setBackground(new Color(35, 45, 65));

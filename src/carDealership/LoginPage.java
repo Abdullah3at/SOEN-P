@@ -1,11 +1,11 @@
 package carDealership;
 
-import persistance.DatabaseManager;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.*;
+import persistance.DatabaseManager;
 
 public class LoginPage extends JFrame implements ActionListener {
     private JTextField usernameField;
@@ -24,6 +24,7 @@ public class LoginPage extends JFrame implements ActionListener {
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
         formPanel.setBackground(Color.WHITE);
+        
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
@@ -84,7 +85,10 @@ public class LoginPage extends JFrame implements ActionListener {
         add(titleLabel, BorderLayout.NORTH);
 
         // Set background color for the frame
-        getContentPane().setBackground(Color.LIGHT_GRAY);
+        getContentPane().setBackground(Color.decode("#56CCF2"));
+        
+     // Allow pressing Enter to trigger login
+        getRootPane().setDefaultButton(loginButton);
     }
 
     @Override
