@@ -469,6 +469,9 @@ public class AdminDashboard extends JFrame implements ActionListener {
         JDialog deleteVehicleDialog = new JDialog(this, "Delete Vehicle", true);
         deleteVehicleDialog.setSize(400, 250);
         deleteVehicleDialog.setLocationRelativeTo(this);
+        //spacing
+        ((JComponent) deleteVehicleDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
     
         JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -735,6 +738,8 @@ public void showAddUserDialog() {
     JDialog addUserDialog = new JDialog(this, "Add User", true);
     addUserDialog.setSize(400, 250);
     addUserDialog.setLocationRelativeTo(this);
+    ((JComponent) addUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 
     JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
     contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
@@ -792,6 +797,8 @@ public void showEditUserDialog() {
     JDialog editUserDialog = new JDialog(this, "Edit User", true);
     editUserDialog.setSize(600, 300);
     editUserDialog.setLocationRelativeTo(this);
+    ((JComponent) editUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 
     // Create a panel with padding and GridLayout
     JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
@@ -892,6 +899,8 @@ public void showDeleteUserDialog() {
     JDialog deleteUserDialog = new JDialog(this, "Delete User", true);
     deleteUserDialog.setSize(400, 200);
     deleteUserDialog.setLocationRelativeTo(this);
+    ((JComponent) deleteUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
 
     JPanel panel = new JPanel(new GridLayout(0, 2, 20, 15));
     panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
