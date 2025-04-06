@@ -48,6 +48,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         //build the sidebar based on role
         sidebar = new JPanel();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         sidebar.setLayout(new GridLayout(0, 1, 10, 10));
         sidebar.setBackground(new Color(35, 45, 65));
         sidebar.setPreferredSize(new Dimension(200, getHeight()));
@@ -109,6 +110,8 @@ public class AdminDashboard extends JFrame implements ActionListener {
         quitButton = createSidebarButton("Quit", new ImageIcon("images/quit.png"));
         sidebar.add(quitButton);
 =======
+=======
+>>>>>>> Stashed changes
 sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.X_AXIS));
 sidebar.setBackground(new Color(20, 10, 20));
 
@@ -158,6 +161,9 @@ rightButtonsPanel.add(quitButton);
 sidebar.add(rightButtonsPanel);
 
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         
         //create the main panel with CardLayout to load separate panels
@@ -200,7 +206,11 @@ sidebar.add(rightButtonsPanel);
     private JButton createSidebarButton(String text, ImageIcon icon) {
         JButton button = new JButton(text, icon);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         button.setFont(new Font("Verdana", Font.BOLD, 14));
+=======
+        button.setFont(new Font("Segoe UI", Font.BOLD, 20));
+>>>>>>> Stashed changes
 =======
         button.setFont(new Font("Segoe UI", Font.BOLD, 20));
 >>>>>>> Stashed changes
@@ -237,7 +247,12 @@ sidebar.add(rightButtonsPanel);
     }
     
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     //highlight selected button with lighter color
+=======
+    
+    
+>>>>>>> Stashed changes
 =======
     
     
@@ -253,7 +268,11 @@ sidebar.add(rightButtonsPanel);
     }
     
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     //handle button actions (regular click or logout)
+=======
+    
+>>>>>>> Stashed changes
 =======
     
 >>>>>>> Stashed changes
