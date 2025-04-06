@@ -47,6 +47,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         
         //build the sidebar based on role
         sidebar = new JPanel();
+<<<<<<< Updated upstream
         sidebar.setLayout(new GridLayout(0, 1, 10, 10));
         sidebar.setBackground(new Color(35, 45, 65));
         sidebar.setPreferredSize(new Dimension(200, getHeight()));
@@ -107,6 +108,57 @@ public class AdminDashboard extends JFrame implements ActionListener {
         sidebar.add(logoutButton);
         quitButton = createSidebarButton("Quit", new ImageIcon("images/quit.png"));
         sidebar.add(quitButton);
+=======
+sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.X_AXIS));
+sidebar.setBackground(new Color(20, 10, 20));
+
+// Left: Role label
+roleLabel = new JLabel("  Role: " + role + "  ");
+roleLabel.setForeground(Color.WHITE);
+roleLabel.setFont(new Font("Segoe UI", Font.BOLD, 18));
+sidebar.add(roleLabel);
+
+// Buttons panel (center section)
+JPanel navButtonsPanel = new JPanel(new GridBagLayout());
+navButtonsPanel.setOpaque(false); // transparent to inherit top bar color
+
+if (role.equalsIgnoreCase("Admin")) {
+    navButtonsPanel.add(userManagementButton = createSidebarButton("User Management", new ImageIcon("images/user.png")));
+    navButtonsPanel.add(inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/icon.jpg")));
+    navButtonsPanel.add(salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png")));
+    navButtonsPanel.add(viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("images/dealership.png")));
+    navButtonsPanel.add(sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png")));
+} else if (role.equalsIgnoreCase("Manager")) {
+    navButtonsPanel.add(inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png")));
+    navButtonsPanel.add(salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png")));
+    navButtonsPanel.add(viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("images/dealership.png")));
+    navButtonsPanel.add(sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png")));
+} else if (role.equalsIgnoreCase("Salesperson")) {
+    navButtonsPanel.add(inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png")));
+    navButtonsPanel.add(salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png")));
+    navButtonsPanel.add(sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png")));
+}
+
+sidebar.add(navButtonsPanel);
+
+// Filler to push the rest to the right
+// Common options for all roles
+sidebar.add(Box.createHorizontalGlue());
+
+// Right: Logout and Quit buttons in their own right-aligned panel
+JPanel rightButtonsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+rightButtonsPanel.setOpaque(false); // Keep background consistent
+
+logoutButton = createSidebarButton("Logout", new ImageIcon("images/logout.png"));
+quitButton = createSidebarButton("Quit", new ImageIcon("images/quit.png"));
+
+rightButtonsPanel.add(logoutButton);
+rightButtonsPanel.add(quitButton);
+
+sidebar.add(rightButtonsPanel);
+
+
+>>>>>>> Stashed changes
         
         //create the main panel with CardLayout to load separate panels
         cardLayout = new CardLayout();
@@ -125,7 +177,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         mainPanel.add(new ViewDealershipPanel(this), "View Dealership");
         mainPanel.add(new SellVehiclePanel(), "Sell Vehicle");
         
-        add(sidebar, BorderLayout.WEST);
+        add(sidebar, BorderLayout.NORTH);
         add(mainPanel, BorderLayout.CENTER);
 
         
@@ -147,53 +199,64 @@ public class AdminDashboard extends JFrame implements ActionListener {
     //method to create UI for the sidebar with action listener
     private JButton createSidebarButton(String text, ImageIcon icon) {
         JButton button = new JButton(text, icon);
+<<<<<<< Updated upstream
         button.setFont(new Font("Verdana", Font.BOLD, 14));
+=======
+        button.setFont(new Font("Segoe UI", Font.BOLD, 20));
+>>>>>>> Stashed changes
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
-        button.setContentAreaFilled(false);
-        button.setOpaque(false);
-        button.setHorizontalAlignment(SwingConstants.LEFT);
-        button.setIconTextGap(10);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        button.setBackground(new Color(67, 70, 75));
+        button.setBorder(BorderFactory.createEmptyBorder(10, 30, 10, 30));
+        button.setMinimumSize(new Dimension(180, 80)); // 
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    
+        StyleHelper.styleSidebarButton(button);  // apply custom styles
+    
         button.addActionListener(this);
         //hover effects for the buttons
         button.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (button != selectedButton) {
-                    button.setBackground(new Color(50, 60, 80));
+                    button.setBackground(new Color(67, 70, 75));
                     button.setOpaque(true);
                 }
             }
+    
             @Override
             public void mouseExited(MouseEvent e) {
                 if (button != selectedButton) {
-                    button.setBackground(new Color(35, 45, 65));
+                    button.setBackground(new Color(67, 70, 75));
                     button.setOpaque(false);
                 }
             }
         });
+    
         return button;
     }
     
+<<<<<<< Updated upstream
     //highlight selected button with lighter color
+=======
+    
+    
+>>>>>>> Stashed changes
     public void setSelectedButton(JButton selectedButton) {
         this.selectedButton = selectedButton;
         for (Component component : sidebar.getComponents()) {
             if (component instanceof JButton) {
                 JButton button = (JButton) component;
-                if (button == selectedButton) {
-                    button.setBackground(new Color(50, 60, 80));
-                    button.setOpaque(true);
-                } else {
-                    button.setBackground(new Color(35, 45, 65));
-                    button.setOpaque(false);
-                }
+                StyleHelper.highlightSidebarButton(button, button == selectedButton);  // 
             }
         }
     }
     
+<<<<<<< Updated upstream
     //handle button actions (regular click or logout)
+=======
+    
+>>>>>>> Stashed changes
     @Override
     public void actionPerformed(ActionEvent e) {
         JButton source = (JButton) e.getSource();
@@ -1322,7 +1385,7 @@ public JPanel createInfoCard(String title, String value) {
     
     JPanel contentPanel = new JPanel();
     contentPanel.setOpaque(false);
-    contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+    contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
     
     JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
     titleLabel.setFont(new Font("SansSerif", Font.BOLD, 18));

@@ -1,11 +1,11 @@
 package carDealership;
 
-import persistance.DatabaseManager;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.*;
+import persistance.DatabaseManager;
 
 public class LoginPage extends JFrame implements ActionListener {
     private JTextField usernameField;
@@ -15,78 +15,150 @@ public class LoginPage extends JFrame implements ActionListener {
 
     public LoginPage() {
         setTitle("Car Dealership System - Login");
-        setSize(400, 300);
+        setSize(1000, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        // Create a panel for the form
-        JPanel formPanel = new JPanel(new GridBagLayout());
-        formPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        formPanel.setBackground(Color.WHITE);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        // Gradient background
+        JPanel gradientPanel = new JPanel() {
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2d = (Graphics2D) g;
+                int width = getWidth();
+                int height = getHeight();
+                GradientPaint gp = new GradientPaint(
+    getWidth(), 0, new Color(0x434343),  // Right side (Dark Gray)
+    0, 0, new Color(0x000000)            // Left side (Black)
+);
 
-        // Username label and field
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        JLabel usernameLabel = new JLabel("Username:");
-        usernameLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        formPanel.add(usernameLabel, gbc);
+                g2d.setPaint(gp);
+                g2d.fillRect(0, 0, width, height);
+            }
+        };
+        gradientPanel.setLayout(new BoxLayout(gradientPanel, BoxLayout.Y_AXIS));
 
-        gbc.gridx = 1;
-        usernameField = new JTextField(15);
-        usernameField.setFont(new Font("Arial", Font.PLAIN, 14));
-        formPanel.add(usernameField, gbc);
+        // Welcome Text
+        JLabel titleLabel = new JLabel("Welcome to Car Dealership System", SwingConstants.CENTER);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(40, 0, 10, 0));
 
-        // Password label and field
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        JLabel passwordLabel = new JLabel("Password:");
-        passwordLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        formPanel.add(passwordLabel, gbc);
+        JLabel subtitleLabel = new JLabel("Effortlessly manage vehicles, users, sales, and more.", SwingConstants.CENTER);
+        subtitleLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        subtitleLabel.setForeground(Color.WHITE);
+        subtitleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        subtitleLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 30, 0));
 
-        gbc.gridx = 1;
-        passwordField = new JPasswordField(15);
-        passwordField.setFont(new Font("Arial", Font.PLAIN, 14));
-        formPanel.add(passwordField, gbc);
+        // Fields Panel
+        JPanel fieldsPanel = new JPanel();
+        fieldsPanel.setOpaque(false);
+        fieldsPanel.setLayout(new BoxLayout(fieldsPanel, BoxLayout.Y_AXIS));
+        fieldsPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Username
+        JLabel userLabel = new JLabel("Username");
+        userLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        userLabel.setForeground(Color.WHITE);
+        userLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        usernameField = new JTextField();
+        usernameField.setMaximumSize(new Dimension(300, 35));
+        usernameField.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        usernameField.setBackground(new Color(0, 0, 0, 0));
+        usernameField.setForeground(Color.WHITE);
+        usernameField.setCaretColor(Color.WHITE);
+        usernameField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
+        usernameField.setOpaque(false);
+
+        // Password
+        JLabel passLabel = new JLabel("Password");
+        passLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        passLabel.setForeground(Color.WHITE);
+        passLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        passwordField = new JPasswordField();
+        passwordField.setMaximumSize(new Dimension(300, 35));
+        passwordField.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        passwordField.setBackground(new Color(0, 0, 0, 0));
+        passwordField.setForeground(Color.WHITE);
+        passwordField.setCaretColor(Color.WHITE);
+        passwordField.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, Color.WHITE));
+        passwordField.setOpaque(false);
 
         // Login button
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
         loginButton = new JButton("Login");
-        loginButton.setFont(new Font("Arial", Font.BOLD, 14));
-        loginButton.setBackground(new Color(59, 89, 182));
-        loginButton.setForeground(Color.WHITE);
+        loginButton.setFont(new Font("SansSerif", Font.BOLD, 16));
+        loginButton.setBackground(Color.WHITE);
+        loginButton.setForeground(new Color(20, 10, 20));
+        loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginButton.setFocusPainted(false);
+        loginButton.setMaximumSize(new Dimension(200, 40));
+        loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginButton.addActionListener(this);
-        formPanel.add(loginButton, gbc);
 
-        // Message label
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
         messageLabel = new JLabel("", SwingConstants.CENTER);
-        messageLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        messageLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         messageLabel.setForeground(Color.RED);
-        formPanel.add(messageLabel, gbc);
+        messageLabel.setForeground(Color.RED);
+messageLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
 
-        // Add form panel to the frame
-        add(formPanel, BorderLayout.CENTER);
+        messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Add a title label at the top
-        JLabel titleLabel = new JLabel("Car Dealership System", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-        titleLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 20, 0));
-        add(titleLabel, BorderLayout.NORTH);
+        fieldsPanel.add(userLabel);
+        fieldsPanel.add(usernameField);
+        fieldsPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+        fieldsPanel.add(passLabel);
+        fieldsPanel.add(passwordField);
+        fieldsPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+        fieldsPanel.add(loginButton);
+        fieldsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+        fieldsPanel.add(messageLabel);
 
-        // Set background color for the frame
-        getContentPane().setBackground(Color.LIGHT_GRAY);
-        
-     // Allow pressing Enter to trigger login
+        gradientPanel.add(titleLabel);
+        gradientPanel.add(subtitleLabel);
+        gradientPanel.add(fieldsPanel);
+
+        // Project Team Section
+        JPanel teamWrapper = new JPanel(new BorderLayout());
+        teamWrapper.setBackground(new Color(245, 245, 245));
+
+        JLabel teamTitle = new JLabel("Project Team", SwingConstants.CENTER);
+        teamTitle.setFont(new Font("SansSerif", Font.BOLD, 22));
+        teamTitle.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
+        teamWrapper.add(teamTitle, BorderLayout.NORTH);
+
+        JPanel teamPanel = new JPanel(new GridLayout(2, 3, 20, 20));
+        teamPanel.setBackground(new Color(245, 245, 245));
+        teamPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 30, 50));
+
+        for (int i = 1; i <= 6; i++) {
+            JPanel card = new JPanel();
+            card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+            card.setBackground(Color.WHITE);
+            card.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true),
+                    BorderFactory.createEmptyBorder(15, 15, 15, 15)));
+
+            JLabel name = new JLabel("Member ");
+            name.setFont(new Font("SansSerif", Font.BOLD, 16));
+            name.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            // JLabel id = new JLabel("ID: ");
+            // id.setFont(new Font("SansSerif", Font.PLAIN, 14));
+            // id.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+            card.add(name);
+            card.add(Box.createRigidArea(new Dimension(0, 5)));
+            // card.add(id);
+            teamPanel.add(card);
+        }
+
+        teamWrapper.add(teamPanel, BorderLayout.CENTER);
+
+        add(gradientPanel, BorderLayout.NORTH);
+        add(teamWrapper, BorderLayout.CENTER);
+
         getRootPane().setDefaultButton(loginButton);
     }
 
@@ -94,83 +166,42 @@ public class LoginPage extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
-
         try {
             if (authenticate(username, password)) {
-                messageLabel.setText("Login successful!");
-                // If the user uses a temporary password, force a password change.
-                if (isTemporaryPassword(username)) {
-                    ChangePasswordDialog changeDialog = new ChangePasswordDialog(username);
-                    changeDialog.setVisible(true);
-                } else {
-                    // Otherwise, fetch the role and continue as normal.
-                    String role = getRole(username);
-                    System.out.println("Role: " + role); // Debugging statement
-                    AdminDashboard dashboard = createDashboardInstance(role);
-                    dashboard.setVisible(true);
-                    dispose(); // Close the login window
-                }
+                String role = getRole(username);
+                AdminDashboard dashboard = createDashboardInstance(role);
+                dashboard.setVisible(true);
+                dispose();
             } else {
-                messageLabel.setText("Invalid username or password. Please try again.");
+                messageLabel.setText("Invalid username or password.");
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
-            messageLabel.setText("Database error. Please try again later.");
+            messageLabel.setText("Database error.");
         }
     }
 
     private boolean authenticate(String username, String password) throws SQLException {
         DatabaseManager dbManager = new DatabaseManager();
-        String query = "SELECT * FROM users WHERE name = '" + username + "' AND password = '" + password + "'";
-        System.out.println("Executing query: " + query); // Debugging statement
-        ResultSet resultSet = dbManager.runQuery(query);
-        boolean authenticated = resultSet.next();
+        ResultSet rs = dbManager.runQuery("SELECT * FROM users WHERE name = '" + username + "' AND password = '" + password + "'");
+        boolean ok = rs.next();
         dbManager.close();
-        return authenticated;
+        return ok;
     }
 
     private String getRole(String username) throws SQLException {
         DatabaseManager dbManager = new DatabaseManager();
-        String query = "SELECT roles.role FROM users JOIN roles ON users.roleId = roles.id WHERE users.name = '" + username + "'";
-        System.out.println("Executing query: " + query); // Debugging statement
-        ResultSet resultSet = dbManager.runQuery(query);
-        String role = null;
-        if (resultSet.next()) {
-            role = resultSet.getString("role");
-        }
+        ResultSet rs = dbManager.runQuery("SELECT roles.role FROM users JOIN roles ON users.roleId = roles.id WHERE users.name = '" + username + "'");
+        String role = rs.next() ? rs.getString("role") : null;
         dbManager.close();
         return role;
     }
 
-    private boolean isTemporaryPassword(String username) throws SQLException {
-        DatabaseManager dbManager = new DatabaseManager();
-        String query = "SELECT isTemp FROM users WHERE name = '" + username + "'";
-        System.out.println("Executing temp query: " + query); // Debug
-        ResultSet resultSet = dbManager.runQuery(query);
-        boolean isTemp = false;
-        if (resultSet.next()) {
-            isTemp = resultSet.getBoolean("isTemp");
-        }
-        dbManager.close();
-        return isTemp;
+    private AdminDashboard createDashboardInstance(String role) {
+        return new AdminDashboard(role);
     }
 
     public static void displayLogin() {
-        SwingUtilities.invokeLater(() -> {
-            LoginPage loginPage = new LoginPage();
-            loginPage.setVisible(true);
-        });
+        SwingUtilities.invokeLater(() -> new LoginPage().setVisible(true));
     }
-
-    private AdminDashboard createDashboardInstance(String role) {
-        if (role.equals("Admin")) {
-            return new AdminDashboard("Admin");
-        } else if (role.equals("Manager")) {
-            return new AdminDashboard("Manager");
-        } else if (role.equals("Salesperson")) {
-            return new AdminDashboard("Salesperson");
-        }
-        return null;
-    }
-    
 }
