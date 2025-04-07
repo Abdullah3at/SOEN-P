@@ -39,7 +39,7 @@ public class UserManagementPanel extends JPanel {
         combinedHeader.add(buttonPanel);
         
         // Create user table
-        String[] columnNames = {"User ID", "Username", "Password", "Role"};
+        String[] columnNames = {"User ID", "Username", "Role", "Is_Temp_password"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         userTable = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(userTable);

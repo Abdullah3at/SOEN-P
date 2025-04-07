@@ -1,11 +1,11 @@
 package carDealership;
 
-import persistance.DatabaseManager;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import persistance.DatabaseManager;
 
 public class SalesHistoryPanel extends JPanel {
     private AdminDashboard parent;
@@ -24,10 +24,24 @@ public class SalesHistoryPanel extends JPanel {
         headerPanel.add(label);
         
         // Button panel for filter button
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
-        JButton filterButton = new JButton("Filter Sales History");
-        filterButton.addActionListener(e -> parent.showSalesHistoryFilterDialog(salesTable));
-        buttonPanel.add(filterButton);
+       // Button panel for filter and clear buttons
+JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+
+JButton filterButton = new JButton("Filter Sales History");
+filterButton.addActionListener(e -> parent.showSalesHistoryFilterDialog(salesTable));
+buttonPanel.add(filterButton);
+
+// New "Clear Filters" button
+JButton clearFiltersButton = new JButton("Clear Filters");
+clearFiltersButton.addActionListener(e -> {
+    // Clear table rows
+    DefaultTableModel model = (DefaultTableModel) salesTable.getModel();
+    model.setRowCount(0);
+    // Re-fetch full data
+    fetchSalesData(model);
+});
+buttonPanel.add(clearFiltersButton);
+
         
         // Combine header and button panels vertically
         JPanel combinedHeader = new JPanel();
