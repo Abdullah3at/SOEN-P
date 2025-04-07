@@ -12,106 +12,39 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 
-/*
- * This is the main dashboard frame for role-based access to the dealership system application.
- * 
- */
-
 public class AdminDashboard extends JFrame implements ActionListener {
-    //user interface components for sidebar actions
     private JButton userManagementButton, inventoryManagementButton, salesHistoryButton, viewDealershipButton, sellVehicleButton, logoutButton, quitButton;
-    private JLabel roleLabel; //display current logged in user role
-    private String role; //current role
+    private JLabel roleLabel;
+    private String role;
     private JPanel mainPanel, sidebar;
-    private CardLayout cardLayout; //card layout to switch between the panels dynamically
+    private CardLayout cardLayout;
     Dealership dealership;
     private JButton selectedButton; // currently selected sidebar button
     public JTable userTable, vehicleTable, salesTable;
     
-    //default constructor for the dashboard (admin)
+
     public AdminDashboard() {
         this("Admin");
     }
     
-    //constructor for the dashboard component with role-based parameter
     public AdminDashboard(String role) {
         this.role = role;
-        setTitle(role + " Dashboard"); //shows what's the role of the current user logged in
+        setTitle(role + " Dashboard");
         setExtendedState(JFrame.MAXIMIZED_BOTH);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        setResizable(false);
+        setResizable(true);
         setLayout(new BorderLayout());
         
+        Toolkit toolkit = Toolkit.getDefaultToolkit();
+        Dimension screenSize = toolkit.getScreenSize();
+        setSize(screenSize.width, screenSize.height);  // Set the size based on screen size
+        setLocation((screenSize.width - getWidth()) / 2, (screenSize.height - getHeight()) / 2);
 
         
-        //build the sidebar based on role
+        // Build the sidebar based on role
         sidebar = new JPanel();
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        sidebar.setLayout(new GridLayout(0, 1, 10, 10));
-        sidebar.setBackground(new Color(35, 45, 65));
-        sidebar.setPreferredSize(new Dimension(200, getHeight()));
         
-        //display the role of the user in the top left corner
-        roleLabel = new JLabel("Role: " + role, SwingConstants.CENTER);
-        roleLabel.setForeground(Color.WHITE);
-        roleLabel.setFont(new Font("Verdana", Font.BOLD, 20));
-        sidebar.add(roleLabel);
-        
-        //if the logged in user is Admin: show all the features
-        if(role.equalsIgnoreCase("Admin")) {
-            userManagementButton = createSidebarButton("User Management", new ImageIcon("images/user.png"));
-            sidebar.add(userManagementButton);
-            
-            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/icon.jpg"));
-            sidebar.add(inventoryManagementButton);
-            
-            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png"));
-            sidebar.add(salesHistoryButton);
-            
-            viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("images/dealership.png"));
-            sidebar.add(viewDealershipButton);
-            
-            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
-            sidebar.add(sellVehicleButton);
-        }
-
-        //if the logged in user is Manager: show everything except User Management
-        else if(role.equalsIgnoreCase("Manager")) {
-            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png"));
-            sidebar.add(inventoryManagementButton);
-            
-            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png"));
-            sidebar.add(salesHistoryButton);
-            
-            viewDealershipButton = createSidebarButton("View Dealership", new ImageIcon("images/dealership.png"));
-            sidebar.add(viewDealershipButton);
-            
-            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
-            sidebar.add(sellVehicleButton);
-        }
-
-        //if the logged in user is Salesperson: show cars in Inventory, Sell Vehicle, and Sales History
-        else if(role.equalsIgnoreCase("Salesperson")) {
-            inventoryManagementButton = createSidebarButton("Inventory Management", new ImageIcon("images/inventory.png"));
-            sidebar.add(inventoryManagementButton);
-            
-            salesHistoryButton = createSidebarButton("Sales History", new ImageIcon("images/sales.png"));
-            sidebar.add(salesHistoryButton);
-            
-            sellVehicleButton = createSidebarButton("Sell Vehicle", new ImageIcon("images/sell.png"));
-            sidebar.add(sellVehicleButton);
-        }
-        
-        //common options for all roles
-        logoutButton = createSidebarButton("Logout", new ImageIcon("images/logout.png"));
-        sidebar.add(logoutButton);
-        quitButton = createSidebarButton("Quit", new ImageIcon("images/quit.png"));
-        sidebar.add(quitButton);
-=======
-=======
->>>>>>> Stashed changes
 sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.X_AXIS));
 sidebar.setBackground(new Color(20, 10, 20));
 
@@ -161,20 +94,15 @@ rightButtonsPanel.add(quitButton);
 sidebar.add(rightButtonsPanel);
 
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
         
-        //create the main panel with CardLayout to load separate panels
+        // Create the main panel with CardLayout to load separate panels.
         cardLayout = new CardLayout();
         mainPanel = new JPanel(cardLayout);
         mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         mainPanel.setBackground(Color.DARK_GRAY);
         
-        /*adding panels based on roles – can be modified in case there's a need to add or remove functionalities
-        for each role, for example, Inventory Management Panel for Salesperson can be modified to display only cars.
-        */
+        // Add panels – you might want to adjust the panels themselves based on role.
+        // For example, InventoryManagementPanel for Salesperson can be modified to display only cars.
         if(role.equalsIgnoreCase("Admin")) {
             mainPanel.add(new UserManagementPanel(this), "User Management");
         }
@@ -187,7 +115,7 @@ sidebar.add(rightButtonsPanel);
         add(mainPanel, BorderLayout.CENTER);
 
         
-    //set default selection for the panel that the user sees after logs in
+    // set default selection for the panel that the user sees after logs in
     JButton defaultButton = null;
     if(role.equalsIgnoreCase("Admin")) {
         //for Admin, default to User Management
@@ -205,15 +133,7 @@ sidebar.add(rightButtonsPanel);
     //method to create UI for the sidebar with action listener
     private JButton createSidebarButton(String text, ImageIcon icon) {
         JButton button = new JButton(text, icon);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        button.setFont(new Font("Verdana", Font.BOLD, 14));
-=======
         button.setFont(new Font("Segoe UI", Font.BOLD, 20));
->>>>>>> Stashed changes
-=======
-        button.setFont(new Font("Segoe UI", Font.BOLD, 20));
->>>>>>> Stashed changes
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setBackground(new Color(67, 70, 75));
@@ -246,43 +166,33 @@ sidebar.add(rightButtonsPanel);
         return button;
     }
     
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    //highlight selected button with lighter color
-=======
     
     
->>>>>>> Stashed changes
-=======
-    
-    
->>>>>>> Stashed changes
     public void setSelectedButton(JButton selectedButton) {
         this.selectedButton = selectedButton;
         for (Component component : sidebar.getComponents()) {
             if (component instanceof JButton) {
                 JButton button = (JButton) component;
+                if (button == selectedButton) {
+                    button.setBackground(Color.decode("#2F80ED"));
+                    button.setOpaque(true);
+                } else {
+                    button.setBackground(new Color(35, 45, 65));
+                    button.setOpaque(false);
+                }
                 StyleHelper.highlightSidebarButton(button, button == selectedButton);  // 
             }
         }
     }
     
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    //handle button actions (regular click or logout)
-=======
     
->>>>>>> Stashed changes
-=======
-    
->>>>>>> Stashed changes
     @Override
     public void actionPerformed(ActionEvent e) {
-        JButton source = (JButton) e.getSource();
+        JButton source = (JButton)e.getSource();
         setSelectedButton(source); //update styling of selected button
         String command = e.getActionCommand();
         cardLayout.show(mainPanel, command);
-    //if the selected button is Logout - prompt the user to confirm 
+        //if the selected button is Logout - prompt the user to confirm        
         if (e.getSource() == logoutButton) {
             int choice = JOptionPane.showConfirmDialog(
                 this,
@@ -302,7 +212,7 @@ sidebar.add(rightButtonsPanel);
         }
     }
     
-    //the following methods are kept in AdminDashboard to be called by panel components.
+    // The following methods are kept in AdminDashboard to be called by panel components.
     public void showAddVehicleDialog() {
         JDialog addVehicleDialog = new JDialog(this, "Add Vehicle", true);
         addVehicleDialog.setSize(400, 400);
@@ -350,8 +260,9 @@ sidebar.add(rightButtonsPanel);
             String type = (String) typeComboBox.getSelectedItem();
             String color = colorField.getText().trim();
     
+            // Check all required fields are filled
             if (make.isEmpty() || model.isEmpty() || yearText.isEmpty() || priceText.isEmpty() || color.isEmpty()) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Please fill in all fields.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(addVehicleDialog, "Please fill in all required fields.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
     
@@ -361,20 +272,21 @@ sidebar.add(rightButtonsPanel);
             }
     
             int year;
+            double price;
+            // Validate Year
             try {
                 year = Integer.parseInt(yearText);
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(addVehicleDialog, "Year must be a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(addVehicleDialog, "Year must be a valid integer.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-    
             int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
             if (year < 1960 || year > currentYear) {
                 JOptionPane.showMessageDialog(addVehicleDialog, "Year must be between 1960 and " + currentYear + ".", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
     
-            double price;
+            // Validate Price
             try {
                 price = Double.parseDouble(priceText);
             } catch (NumberFormatException ex) {
@@ -386,14 +298,14 @@ sidebar.add(rightButtonsPanel);
                 JOptionPane.showMessageDialog(addVehicleDialog, "Price must be greater than 0.", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-    
+
+            // Add vehicle to the database
             try {
                 DatabaseManager dbManager = new DatabaseManager();
-                String query = "INSERT INTO vehicles (make, model, year, price, type, color) VALUES ('"
-                             + make + "', '" + model + "', " + year + ", " + price + ", '" + type + "', '" + color + "')";
+                String query = "INSERT INTO vehicles (make, model, year, price, type, color) VALUES ('" 
+                            + make + "', '" + model + "', " + year + ", " + price + ", '" + type + "', '" + color + "')";
                 dbManager.runInsert(query);
                 dbManager.close();
-    
                 JOptionPane.showMessageDialog(this, "Vehicle added successfully.");
                 addVehicleDialog.dispose();
             } catch (SQLException ex) {
@@ -404,9 +316,8 @@ sidebar.add(rightButtonsPanel);
     
         addVehicleDialog.setVisible(true);
     }
-             
 
-    public void showEditVehicleDialog() {
+   public void showEditVehicleDialog() {
         JDialog editVehicleDialog = new JDialog(this, "Edit Vehicle", true);
         editVehicleDialog.setSize(400, 400);
         editVehicleDialog.setLocationRelativeTo(this);
@@ -481,72 +392,69 @@ sidebar.add(rightButtonsPanel);
                 JOptionPane.showMessageDialog(editVehicleDialog, "Error loading vehicle data.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
-    
-        // Submit edit
-        editButton.addActionListener(e -> {
-            try {
-                int vehicleId = Integer.parseInt(vehicleIdField.getText().trim());
-                String make = makeField.getText().trim();
-                String model = modelField.getText().trim();
-                String yearText = yearField.getText().trim();
-                String priceText = priceField.getText().trim();
-                String type = (String) typeComboBox.getSelectedItem();
-                String color = colorField.getText().trim();
-    
-                // Empty check
-                if (make.isEmpty() || model.isEmpty() || yearText.isEmpty() || priceText.isEmpty() || color.isEmpty()) {
-                    JOptionPane.showMessageDialog(editVehicleDialog, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-    
-                // Make validation
-                if (!make.matches("[a-zA-Z ]+")) {
-                    JOptionPane.showMessageDialog(editVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-    
-                // Year validation
-                int year = Integer.parseInt(yearText);
-                int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
-                if (year < 1960 || year > currentYear + 1) {
-                    JOptionPane.showMessageDialog(editVehicleDialog, "Year must be between 1960 and " + (currentYear + 1) + ".", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-    
-                // Price validation
-                double price = Double.parseDouble(priceText);
-                if (price < 0) {
-                    JOptionPane.showMessageDialog(editVehicleDialog, "Price cannot be negative.", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-    
-                // Update vehicle
-                DatabaseManager dbManager = new DatabaseManager();
-                String updateQuery = "UPDATE vehicles SET " +
-                                     "make = '" + make + "', " +
-                                     "model = '" + model + "', " +
-                                     "year = " + year + ", " +
-                                     "price = " + price + ", " +
-                                     "type = '" + type + "', " +
-                                     "color = '" + color + "' " +
-                                     "WHERE id = " + vehicleId;
-                dbManager.runInsert(updateQuery);
-                dbManager.close();
-    
-                JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle updated successfully.");
-                editVehicleDialog.dispose();
-    
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(editVehicleDialog, "Please enter valid numeric values for Vehicle ID, Year, and Price.", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(editVehicleDialog, "Error updating vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
+
+    editButton.addActionListener(e -> {
+        try {
+            int vehicleId = Integer.parseInt(vehicleIdField.getText().trim());
+            String make = makeField.getText().trim();
+            String model = modelField.getText().trim();
+            String yearText = yearField.getText().trim();
+            String priceText = priceField.getText().trim();
+            String type = (String) typeComboBox.getSelectedItem();
+            String color = colorField.getText().trim();
+
+            // Empty check
+            if (make.isEmpty() || model.isEmpty() || yearText.isEmpty() || priceText.isEmpty() || color.isEmpty()) {
+                JOptionPane.showMessageDialog(editVehicleDialog, "All fields must be filled out.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
-        });
-    
-        editVehicleDialog.setVisible(true);
-    }
-     
+
+            // Make validation
+            if (!make.matches("[a-zA-Z ]+")) {
+                JOptionPane.showMessageDialog(editVehicleDialog, "Make must contain only letters.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Year validation
+            int year = Integer.parseInt(yearText);
+            int currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+            if (year < 1960 || year > currentYear + 1) {
+                JOptionPane.showMessageDialog(editVehicleDialog, "Year must be between 1960 and " + (currentYear + 1) + ".", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Price validation
+            double price = Double.parseDouble(priceText);
+            if (price < 0) {
+                JOptionPane.showMessageDialog(editVehicleDialog, "Price cannot be negative.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Update vehicle
+            DatabaseManager dbManager = new DatabaseManager();
+            String updateQuery = "UPDATE vehicles SET " +
+                                 "make = '" + make + "', " +
+                                 "model = '" + model + "', " +
+                                 "year = " + year + ", " +
+                                 "price = " + price + ", " +
+                                 "type = '" + type + "', " +
+                                 "color = '" + color + "' " +
+                                 "WHERE id = " + vehicleId;
+            dbManager.runInsert(updateQuery);
+            dbManager.close();
+
+            JOptionPane.showMessageDialog(editVehicleDialog, "Vehicle updated successfully.");
+            editVehicleDialog.dispose();
+
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(editVehicleDialog, "Please enter valid numeric values for Vehicle ID, Year, and Price.", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(editVehicleDialog, "Error updating vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    });
+    editVehicleDialog.setVisible(true);
+}
     public void showDeleteVehicleDialog() {
         JDialog deleteVehicleDialog = new JDialog(this, "Delete Vehicle", true);
         deleteVehicleDialog.setSize(400, 250);
@@ -620,21 +528,22 @@ sidebar.add(rightButtonsPanel);
                 JOptionPane.showMessageDialog(deleteVehicleDialog, "Error deleting vehicle.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         });
+
     
         deleteVehicleDialog.setVisible(true);
     }
-    
+
     public void showViewVehiclesDialog(DefaultTableModel model) {
-    //clear existing rows
+    // Clear existing rows
     model.setRowCount(0);
 
-    //fetch vehicles from the database excluding sold ones
+    // Fetch vehicles from the database excluding sold ones
     try {
         DatabaseManager dbManager = new DatabaseManager();
         String query = "SELECT id, make, model, year, price, type, color FROM vehicles WHERE sold = 0";
         ResultSet resultSet = dbManager.runQuery(query);
 
-        //populate the table with data
+        // Populate the table with data
         while (resultSet.next()) {
             int vehicleId = resultSet.getInt("id");
             String make = resultSet.getString("make");
@@ -698,7 +607,7 @@ public void showFilterDialog(JTable vehicleTable) {
     filterDialog.add(typeComboBox, gbc);
     gbc.gridwidth = 1;
 
-    //color filter remains unchanged
+    // Color filter remains unchanged
     JCheckBox colorCheckBox = new JCheckBox("Color");
     JTextField colorField = new JTextField();
     colorField.setPreferredSize(new Dimension(200, 25));
@@ -713,7 +622,7 @@ public void showFilterDialog(JTable vehicleTable) {
     filterDialog.add(colorField, gbc);
     gbc.gridwidth = 1;
 
-    //Make filter remains unchanged
+    // Make filter remains unchanged
     JCheckBox brandCheckBox = new JCheckBox("Make");
     JTextField brandField = new JTextField();
     brandField.setPreferredSize(new Dimension(200, 25));
@@ -728,7 +637,7 @@ public void showFilterDialog(JTable vehicleTable) {
     filterDialog.add(brandField, gbc);
     gbc.gridwidth = 1;
 
-    //date filter: using JDateChoosers for from and to dates
+    // Date filter: using JDateChoosers for from and to dates
     JCheckBox dateCheckBox = new JCheckBox("Date");
     JDateChooser fromDateChooser = new JDateChooser();
     fromDateChooser.setDateFormatString("dd-MM-yyyy");
@@ -857,6 +766,7 @@ public void showAddUserDialog() {
             return;
         }
 
+        // Add user to the database
         try {
             DatabaseManager dbManager = new DatabaseManager();
             String query = "INSERT INTO users (name, password, roleId, isTemp) VALUES ('" 
@@ -873,7 +783,6 @@ public void showAddUserDialog() {
 
     addUserDialog.setVisible(true);
 }
-
 
 public void showEditUserDialog() {
     JDialog editUserDialog = new JDialog(this, "Edit User", true);
@@ -911,8 +820,6 @@ public void showEditUserDialog() {
 
     // Add content panel to dialog
     editUserDialog.setContentPane(contentPanel);
-
-    // Load data action
     loadButton.addActionListener(e -> {
         try {
             int userId = Integer.parseInt(userIdField.getText().trim());
@@ -931,7 +838,6 @@ public void showEditUserDialog() {
                 roleComboBox.setSelectedIndex(0);
                 JOptionPane.showMessageDialog(this, "User ID not found.");
             }
-
             rs.close();
             dbManager.close();
         } catch (SQLException ex) {
@@ -942,7 +848,7 @@ public void showEditUserDialog() {
         }
     });
 
-    // Edit action
+    // Handle the edit action when the "Edit" button is clicked
     editButton.addActionListener(e -> {
         String username = usernameField.getText().trim();
         String password = "TempPass"; // Always set password to TempPass
@@ -972,7 +878,6 @@ public void showEditUserDialog() {
             JOptionPane.showMessageDialog(this, "Invalid User ID format.");
         }
     });
-
     editUserDialog.setVisible(true);
 }
 
