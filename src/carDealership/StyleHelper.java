@@ -81,7 +81,7 @@ public class StyleHelper {
             @Override
             public void mouseEntered(java.awt.event.MouseEvent e) {
                 if (!button.getModel().isPressed()) {
-                    button.setBackground(new Color(50, 60, 80));
+                    button.setBackground(new Color(70, 70, 70));
                     button.setOpaque(true);
                 }
             }
@@ -89,7 +89,7 @@ public class StyleHelper {
             @Override
             public void mouseExited(java.awt.event.MouseEvent e) {
                 if (!button.getModel().isPressed()) {
-                    button.setBackground(new Color(35, 45, 65));
+                    button.setBackground(new Color(70, 70, 70));
                     button.setOpaque(false);
                 }
             }

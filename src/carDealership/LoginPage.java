@@ -27,10 +27,9 @@ public class LoginPage extends JFrame implements ActionListener {
                 int width = getWidth();
                 int height = getHeight();
                 GradientPaint gp = new GradientPaint(
-    getWidth(), 0, new Color(0x434343),  // Right side (Dark Gray)
-    0, 0, new Color(0x000000)            // Left side (Black)
-);
-
+                    getWidth(), 0, new Color(0x434343),
+                    0, 0, new Color(0x000000)
+                );
                 g2d.setPaint(gp);
                 g2d.fillRect(0, 0, width, height);
             }
@@ -98,11 +97,8 @@ public class LoginPage extends JFrame implements ActionListener {
         loginButton.addActionListener(this);
 
         messageLabel = new JLabel("", SwingConstants.CENTER);
-        messageLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        messageLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         messageLabel.setForeground(Color.RED);
-        messageLabel.setForeground(Color.RED);
-messageLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
-
         messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         fieldsPanel.add(userLabel);
@@ -119,46 +115,8 @@ messageLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
         gradientPanel.add(subtitleLabel);
         gradientPanel.add(fieldsPanel);
 
-        // Project Team Section
-        JPanel teamWrapper = new JPanel(new BorderLayout());
-        teamWrapper.setBackground(new Color(245, 245, 245));
-
-        JLabel teamTitle = new JLabel("Project Team", SwingConstants.CENTER);
-        teamTitle.setFont(new Font("SansSerif", Font.BOLD, 22));
-        teamTitle.setBorder(BorderFactory.createEmptyBorder(30, 0, 20, 0));
-        teamWrapper.add(teamTitle, BorderLayout.NORTH);
-
-        JPanel teamPanel = new JPanel(new GridLayout(2, 3, 20, 20));
-        teamPanel.setBackground(new Color(245, 245, 245));
-        teamPanel.setBorder(BorderFactory.createEmptyBorder(0, 50, 30, 50));
-
-        for (int i = 1; i <= 6; i++) {
-            JPanel card = new JPanel();
-            card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
-            card.setBackground(Color.WHITE);
-            card.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true),
-                    BorderFactory.createEmptyBorder(15, 15, 15, 15)));
-
-            JLabel name = new JLabel("Member ");
-            name.setFont(new Font("SansSerif", Font.BOLD, 16));
-            name.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            // JLabel id = new JLabel("ID: ");
-            // id.setFont(new Font("SansSerif", Font.PLAIN, 14));
-            // id.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-            card.add(name);
-            card.add(Box.createRigidArea(new Dimension(0, 5)));
-            // card.add(id);
-            teamPanel.add(card);
-        }
-
-        teamWrapper.add(teamPanel, BorderLayout.CENTER);
-
-        add(gradientPanel, BorderLayout.NORTH);
-        add(teamWrapper, BorderLayout.CENTER);
-
+        // Final Layout
+        add(gradientPanel, BorderLayout.CENTER);
         getRootPane().setDefaultButton(loginButton);
     }
 

@@ -1331,11 +1331,11 @@ public JPanel createInfoCard(String title, String value) {
     card.addMouseListener(new java.awt.event.MouseAdapter() {
         @Override
         public void mouseEntered(java.awt.event.MouseEvent e) {
-            card.setBorder(BorderFactory.createLineBorder(new Color(100, 100, 130), 2));
+            card.setBorder(BorderFactory.createLineBorder(new Color(70, 70, 70), 2));
         }
         @Override
         public void mouseExited(java.awt.event.MouseEvent e) {
-            card.setBorder(BorderFactory.createEmptyBorder());
+            card.setBorder(BorderFactory.createLineBorder(new Color(70, 70, 70), 2));
         }
     });
     

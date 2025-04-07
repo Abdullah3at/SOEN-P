@@ -1,65 +1,104 @@
 package carDealership;
 
+import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
 public class UserManagementPanel extends JPanel {
     private AdminDashboard parent;
     private JTable userTable;
-    
+
     public UserManagementPanel(AdminDashboard parent) {
         this.parent = parent;
         setLayout(new BorderLayout());
         setBackground(Color.LIGHT_GRAY);
-        
-        // Header panel for the label
-        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        headerPanel.setBackground(Color.LIGHT_GRAY);
+
+        // --- HEADER ---
+        ModernPanel headerPanel = new ModernPanel();
+        headerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         JLabel label = new JLabel("User Management");
-        label.setFont(new Font("Arial", Font.BOLD, 24));
+        label.setFont(new Font("Segoe UI", Font.BOLD, 26));
         headerPanel.add(label);
-        
-        // Button panel for user management actions
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 10));
+
+        // --- BUTTONS ---
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttonPanel.setBackground(Color.LIGHT_GRAY);
+
         JButton addUserButton = new JButton("Add User");
         JButton editUserButton = new JButton("Edit User");
         JButton deleteUserButton = new JButton("Delete User");
         JButton viewUsersButton = new JButton("View Users");
-        buttonPanel.add(addUserButton);
-        buttonPanel.add(editUserButton);
-        buttonPanel.add(deleteUserButton);
-        buttonPanel.add(viewUsersButton);
-        
-        // Combine header and button panels
+
+        JButton[] buttons = {addUserButton, editUserButton, deleteUserButton, viewUsersButton};
+        for (JButton btn : buttons) {
+            StyleHelper.styleButton(btn);
+            btn.setPreferredSize(new Dimension(140, 40));
+            buttonPanel.add(btn);
+        }
+
+        // --- HEADER COMBINED ---
         JPanel combinedHeader = new JPanel();
-        combinedHeader.setBackground(Color.LIGHT_GRAY);
         combinedHeader.setLayout(new BoxLayout(combinedHeader, BoxLayout.Y_AXIS));
+        combinedHeader.setBackground(Color.LIGHT_GRAY);
+        combinedHeader.add(Box.createVerticalStrut(10));
         combinedHeader.add(headerPanel);
+        combinedHeader.add(Box.createVerticalStrut(5));
         combinedHeader.add(buttonPanel);
-        
-        // Create user table
+        combinedHeader.add(Box.createVerticalStrut(10));
+
+        // --- TABLE SETUP ---
         String[] columnNames = {"User ID", "Username", "Role", "Is_Temp_password"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
         userTable = new JTable(model);
-        JScrollPane scrollPane = new JScrollPane(userTable);
         userTable.setRowHeight(25);
+        StyleHelper.styleTable(userTable);
 
-        
+        JScrollPane scrollPane = new JScrollPane(userTable);
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+        userTable.setOpaque(false);
+
+        // --- WATERMARK PANEL ---
+        JPanel watermarkPanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                Graphics2D g2d = (Graphics2D) g.create();
+
+                ImageIcon icon = new ImageIcon("src/images/car.png");
+                int fixedWidth = 1100;
+                int fixedHeight = 1100;
+                int x = (getWidth() - fixedWidth) / 2;
+                int y = (getHeight() - fixedHeight) / 2;
+
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.05f));
+                g2d.drawImage(icon.getImage(), x, y, fixedWidth, fixedHeight, this);
+                g2d.dispose();
+            }
+        };
+        watermarkPanel.setOpaque(false);
+
+        // --- LAYERED PANE ---
+        JLayeredPane layeredPane = new JLayeredPane();
+        layeredPane.setLayout(new OverlayLayout(layeredPane));
+        layeredPane.setPreferredSize(new Dimension(1000, 400));
+        layeredPane.add(watermarkPanel, Integer.valueOf(1));
+        layeredPane.add(scrollPane, Integer.valueOf(0));
+
+        // --- FINAL LAYOUT ---
         add(combinedHeader, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
-        
-        // Connect buttons to parent methods
+        add(layeredPane, BorderLayout.CENTER);
+
+        // --- Button Actions ---
         addUserButton.addActionListener(e -> parent.showAddUserDialog());
         editUserButton.addActionListener(e -> parent.showEditUserDialog());
         deleteUserButton.addActionListener(e -> parent.showDeleteUserDialog());
         viewUsersButton.addActionListener(e -> parent.showViewUsersDialog(model));
-        
-        // Automatically display user table when the panel is loaded.
+
+        // Load users
         parent.showViewUsersDialog(model);
     }
-    
-    // Getter for JTable object
+
     public JTable getUserTable() {
         return userTable;
     }
