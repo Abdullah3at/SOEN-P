@@ -137,20 +137,20 @@ public class ViewDealershipPanel extends JPanel {
                 }
 
                 SwingUtilities.invokeLater(() -> {
-                    cardsPanel.add(parent.createInfoCard("Dealership Name", dealershipname[0]));
-                    cardsPanel.add(parent.createInfoCard("Dealership Location", dealershiplocation[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Sales Amount", totalSalesAmount[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Vehicles Sold", totalVehicleSold[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Cars Available", TotalCarsAvailable[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Motorcycles Available", TotalMotorcyclesAvailable[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Cars Sold", totalCarsSold[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Motorcycles Sold", totalMotorcyclesSold[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Inventory Cost", totalInventoryCost[0]));
-                    cardsPanel.add(parent.createInfoCard("Available Capacity", availableCapacity[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Users", totalUsers[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Sales Persons", totalSalesPersons[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Admins", totalAdmins[0]));
-                    cardsPanel.add(parent.createInfoCard("Total Managers", totalManagers[0]));
+                    addCard("Dealership Name", dealershipname[0]);
+                    addCard("Dealership Location", dealershiplocation[0]);
+                    addCard("Total Sales Amount", totalSalesAmount[0]);
+                    addCard("Total Vehicles Sold", totalVehicleSold[0]);
+                    addCard("Total Cars Available", TotalCarsAvailable[0]);
+                    addCard("Total Motorcycles Available", TotalMotorcyclesAvailable[0]);
+                    addCard("Total Cars Sold", totalCarsSold[0]);
+                    addCard("Total Motorcycles Sold", totalMotorcyclesSold[0]);
+                    addCard("Total Inventory Cost", totalInventoryCost[0]);
+                    addCard("Available Capacity", availableCapacity[0]);
+                    addCard("Total Users", totalUsers[0]);
+                    addCard("Total Sales Persons", totalSalesPersons[0]);
+                    addCard("Total Admins", totalAdmins[0]);
+                    addCard("Total Managers", totalManagers[0]);
 
                     cardsPanel.revalidate();
                     cardsPanel.repaint();
@@ -159,5 +159,29 @@ public class ViewDealershipPanel extends JPanel {
                 return null;
             }
         }.execute();
+    }
+
+    private void addCard(String title, String value) {
+        JPanel card = new JPanel();
+        card.setPreferredSize(new Dimension(200, 100));
+        card.setLayout(new BoxLayout(card, BoxLayout.Y_AXIS));
+        card.setBackground(Color.WHITE);
+        card.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createLineBorder(new Color(220, 220, 220), 1, true),
+            BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+
+        JLabel titleLabel = new JLabel(title);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 14));
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setFont(new Font("SansSerif", Font.PLAIN, 18));
+        valueLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        card.add(titleLabel);
+        card.add(Box.createRigidArea(new Dimension(0, 8)));
+        card.add(valueLabel);
+
+        cardsPanel.add(card);
     }
 }
