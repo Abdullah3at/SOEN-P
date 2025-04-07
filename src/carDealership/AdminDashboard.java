@@ -47,6 +47,7 @@ public class AdminDashboard extends JFrame implements ActionListener {
         
         //build the sidebar based on role
         sidebar = new JPanel();
+
         sidebar.setLayout(new GridLayout(0, 1, 10, 10));
         sidebar.setBackground(Color.decode("#56CCF2"));
         sidebar.setPreferredSize(new Dimension(200, getHeight()));
