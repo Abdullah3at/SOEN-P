@@ -671,14 +671,24 @@ public void showFilterDialog(JTable vehicleTable) {
              String type = (String) typeComboBox.getSelectedItem();
              String color = colorField.getText();
              String brand = brandField.getText();
-             applyFilters(vehicleTable, budgetCheckBox.isSelected(), minBudget, maxBudget, typeCheckBox.isSelected(), type, colorCheckBox.isSelected(), color, brandCheckBox.isSelected(), brand);
+             
+             // Extract years from the JDateChooser fields
+             Integer fromYear = null, toYear = null;
+             if (fromDateChooser.getDate() != null) {
+                 fromYear = fromDateChooser.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).getYear();
+             }
+             if (toDateChooser.getDate() != null) {
+                 toYear = toDateChooser.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).getYear();
+             }
+             
+             applyFilters(vehicleTable, budgetCheckBox.isSelected(), minBudget, maxBudget, typeCheckBox.isSelected(), type, colorCheckBox.isSelected(), color, brandCheckBox.isSelected(), brand, dateCheckBox.isSelected(), fromYear, toYear);
              filterDialog.dispose();
          });
 
     filterDialog.setVisible(true);
 }
 
-private void applyFilters(JTable vehicleTable, boolean budget, double minBudget, double maxBudget, boolean type, String typeValue, boolean color, String colorValue, boolean brand, String brandValue) {
+private void applyFilters(JTable vehicleTable, boolean budget, double minBudget, double maxBudget, boolean type, String typeValue, boolean color, String colorValue, boolean brand, String brandValue, boolean date, Integer fromYear, Integer toYear) {
     DefaultTableModel model = (DefaultTableModel) vehicleTable.getModel();
     model.setRowCount(0); // Clear existing rows
 
@@ -696,6 +706,16 @@ private void applyFilters(JTable vehicleTable, boolean budget, double minBudget,
     }
     if (brand) {
         queryBuilder.append(" AND make = '").append(brandValue).append("'");
+    }
+    
+    if (date) {
+        if (fromYear != null && toYear != null) {
+            queryBuilder.append(" AND year BETWEEN ").append(fromYear).append(" AND ").append(toYear);
+        } else if (fromYear != null) {
+            queryBuilder.append(" AND year >= ").append(fromYear);
+        } else if (toYear != null) {
+            queryBuilder.append(" AND year <= ").append(toYear);
+        }
     }
 
     String query = queryBuilder.toString();
