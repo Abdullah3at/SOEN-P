@@ -754,7 +754,6 @@ public void showAddUserDialog() {
     addUserDialog.setLocationRelativeTo(this);
     ((JComponent) addUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
-
     JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
     contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
 
@@ -789,9 +788,23 @@ public void showAddUserDialog() {
             return;
         }
 
-        // Add user to the database
         try {
             DatabaseManager dbManager = new DatabaseManager();
+            
+            // Check if username already exists
+            String checkQuery = "SELECT COUNT(*) FROM users WHERE name = '" + username + "'";
+            ResultSet rs = dbManager.runQuery(checkQuery);
+            rs.next();
+            int count = rs.getInt(1);
+            if (count > 0) {
+                // Username already exists
+                JOptionPane.showMessageDialog(addUserDialog,
+                        "Username already exists.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Add user to the database
             String query = "INSERT INTO users (name, password, roleId, isTemp) VALUES ('" 
                          + username + "', '" + password + "', (SELECT id FROM roles WHERE role = '" + role + "' LIMIT 1), 1)";
             dbManager.runInsert(query);
@@ -812,7 +825,6 @@ public void showEditUserDialog() {
     editUserDialog.setSize(600, 300);
     editUserDialog.setLocationRelativeTo(this);
     ((JComponent) editUserDialog.getContentPane()).setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-
 
     // Create a panel with padding and GridLayout
     JPanel contentPanel = new JPanel(new GridLayout(0, 2, 20, 15));
@@ -843,6 +855,7 @@ public void showEditUserDialog() {
 
     // Add content panel to dialog
     editUserDialog.setContentPane(contentPanel);
+    
     loadButton.addActionListener(e -> {
         try {
             int userId = Integer.parseInt(userIdField.getText().trim());
@@ -883,8 +896,23 @@ public void showEditUserDialog() {
         }
 
         try {
-            int userId = Integer.parseInt(userIdField.getText().trim());
             DatabaseManager dbManager = new DatabaseManager();
+            int userId = Integer.parseInt(userIdField.getText().trim());
+            
+            // Check if username already exists, excluding the current user
+            String checkQuery = "SELECT COUNT(*) FROM users WHERE name = '" + username + "' AND id != " + userId;
+            ResultSet rs = dbManager.runQuery(checkQuery);
+            rs.next();
+            int count = rs.getInt(1);
+            if (count > 0) {
+                // Username already exists
+                JOptionPane.showMessageDialog(editUserDialog,
+                        "Username already exists.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Proceed with updating the user information
             String query = "UPDATE users SET name = '" + username + "', password = '" + password +
                            "', roleId = (SELECT id FROM roles WHERE role = '" + role + "'), isTemp = 1 WHERE id = " + userId;
             dbManager.runInsert(query);
@@ -901,6 +929,7 @@ public void showEditUserDialog() {
             JOptionPane.showMessageDialog(this, "Invalid User ID format.");
         }
     });
+
     editUserDialog.setVisible(true);
 }
 

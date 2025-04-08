@@ -14,7 +14,7 @@ public class LoginPage extends JFrame implements ActionListener {
     private JLabel messageLabel;
 
     public LoginPage() {
-        setTitle("Car Dealership System - Login");
+        setTitle("My Car Dealership System - Login");
         setSize(1000, 650);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -37,7 +37,7 @@ public class LoginPage extends JFrame implements ActionListener {
         gradientPanel.setLayout(new BoxLayout(gradientPanel, BoxLayout.Y_AXIS));
 
         // Welcome Text
-        JLabel titleLabel = new JLabel("Welcome to Car Dealership System", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Welcome to My Car Dealership System", SwingConstants.CENTER);
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 28));
         titleLabel.setForeground(Color.WHITE);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
