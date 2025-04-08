@@ -11,6 +11,7 @@ import java.awt.event.*;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
+import java.time.Year;
 
 public class AdminDashboard extends JFrame implements ActionListener {
     private JButton userManagementButton, inventoryManagementButton, salesHistoryButton, viewDealershipButton, sellVehicleButton, logoutButton, quitButton;
@@ -637,24 +638,33 @@ public void showFilterDialog(JTable vehicleTable) {
     filterDialog.add(brandField, gbc);
     gbc.gridwidth = 1;
 
-    // Date filter: using JDateChoosers for from and to dates
-    JCheckBox dateCheckBox = new JCheckBox("Date");
-    JDateChooser fromDateChooser = new JDateChooser();
-    fromDateChooser.setDateFormatString("dd-MM-yyyy");
-    JDateChooser toDateChooser = new JDateChooser();
-    toDateChooser.setDateFormatString("dd-MM-yyyy");
+    // Year filter using JSpinners
+    JCheckBox dateCheckBox = new JCheckBox("Model Year");
+    int currentYear = Year.now().getValue();
+    
+    SpinnerNumberModel fromYearModel = new SpinnerNumberModel(currentYear - 10, 1900, currentYear, 1);
+    SpinnerNumberModel toYearModel = new SpinnerNumberModel(currentYear, 1900, currentYear + 1, 1);
 
+    JSpinner fromYearSpinner = new JSpinner(fromYearModel);
+    JSpinner.NumberEditor fromEditor = new JSpinner.NumberEditor(fromYearSpinner, "####");
+    fromYearSpinner.setEditor(fromEditor);
+
+    JSpinner toYearSpinner = new JSpinner(toYearModel);
+    JSpinner.NumberEditor toEditor = new JSpinner.NumberEditor(toYearSpinner, "####");
+    toYearSpinner.setEditor(toEditor);
+
+    // Add to layout
     gbc.gridx = 0;
     gbc.gridy = 4;
     filterDialog.add(dateCheckBox, gbc);
     gbc.gridx = 1;
     filterDialog.add(new JLabel("From:"), gbc);
     gbc.gridx = 2;
-    filterDialog.add(fromDateChooser, gbc);
+    filterDialog.add(fromYearSpinner, gbc);
     gbc.gridx = 3;
     filterDialog.add(new JLabel("To:"), gbc);
     gbc.gridx = 4;
-    filterDialog.add(toDateChooser, gbc);
+    filterDialog.add(toYearSpinner, gbc);
 
     // Apply button
     JButton applyButton = new JButton("Apply Filters");
@@ -671,15 +681,8 @@ public void showFilterDialog(JTable vehicleTable) {
              String type = (String) typeComboBox.getSelectedItem();
              String color = colorField.getText();
              String brand = brandField.getText();
-             
-             // Extract years from the JDateChooser fields
-             Integer fromYear = null, toYear = null;
-             if (fromDateChooser.getDate() != null) {
-                 fromYear = fromDateChooser.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).getYear();
-             }
-             if (toDateChooser.getDate() != null) {
-                 toYear = toDateChooser.getDate().toInstant().atZone(java.time.ZoneId.systemDefault()).getYear();
-             }
+             Integer fromYear = dateCheckBox.isSelected() ? (Integer) fromYearSpinner.getValue() : null;
+             Integer toYear = dateCheckBox.isSelected() ? (Integer) toYearSpinner.getValue() : null;
              
              applyFilters(vehicleTable, budgetCheckBox.isSelected(), minBudget, maxBudget, typeCheckBox.isSelected(), type, colorCheckBox.isSelected(), color, brandCheckBox.isSelected(), brand, dateCheckBox.isSelected(), fromYear, toYear);
              filterDialog.dispose();
