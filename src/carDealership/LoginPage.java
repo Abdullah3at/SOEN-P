@@ -124,12 +124,21 @@ public class LoginPage extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
+
         try {
             if (authenticate(username, password)) {
-                String role = getRole(username);
-                AdminDashboard dashboard = createDashboardInstance(role);
-                dashboard.setVisible(true);
-                dispose();
+                if (isTemporaryPassword(username)) {
+                    // Prompt the user to change their temporary password
+                    ChangePasswordDialog changeDialog = new ChangePasswordDialog(username);
+                    changeDialog.setVisible(true);
+                    dispose(); // Close login page while the dialog is active
+                } else {
+                    // Normal login
+                    String role = getRole(username);
+                    AdminDashboard dashboard = createDashboardInstance(role);
+                    dashboard.setVisible(true);
+                    dispose();
+                }
             } else {
                 messageLabel.setText("Invalid username or password.");
             }
@@ -162,4 +171,16 @@ public class LoginPage extends JFrame implements ActionListener {
     public static void displayLogin() {
         SwingUtilities.invokeLater(() -> new LoginPage().setVisible(true));
     }
+
+
+private boolean isTemporaryPassword(String username) throws SQLException {
+    DatabaseManager dbManager = new DatabaseManager();
+    ResultSet rs = dbManager.runQuery("SELECT isTemp FROM users WHERE name = '" + username + "'");
+    boolean isTemp = false;
+    if (rs.next()) {
+        isTemp = rs.getBoolean("isTemp");
+    }
+    dbManager.close();
+    return isTemp;
+	}
 }
